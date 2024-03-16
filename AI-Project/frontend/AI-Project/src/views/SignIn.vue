@@ -1,17 +1,33 @@
 <script setup>
+import { ref } from 'vue'
 import MaterialInput from "@/components/MaterialInput.vue";
 import MaterialSwitch from "@/components/MaterialSwitch.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
+
+async function loginSubmit() {
+  var email = document.getElementById("email").value;
+  var password = document.getElementById("password").value;
+  const response = await fetch('http://127.0.0.1:8000/chatbot/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email:email, password:password })
+  });
+  if (response.ok) {
+    const data = await response.json();
+    console.log(data);
+    alert('logged in...');
+  } else {
+    const error = await response.json();
+    console.error(error);
+    alert('error...');
+  }
+}
 </script>
 <template>
     <div
-      class="page-header align-items-start min-vh-100"
-      :style="{
-        backgroundImage:
-          'url(https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80)'
-      }"
-      loading="lazy"
-    >
+      class="page-header align-items-start min-vh-100 bg">
       <span class="mask bg-gradient-dark opacity-6"></span>
       <div class="container my-auto">
         <div class="row">
@@ -26,7 +42,7 @@ import MaterialButton from "@/components/MaterialButton.vue";
                   <h4
                     class="text-white font-weight-bolder text-center mt-2 mb-0"
                   >
-                    Sign in
+                    Log in
                   </h4>
                   <div class="row mt-3">
                     <div class="col-2 text-center ms-auto">
@@ -48,17 +64,17 @@ import MaterialButton from "@/components/MaterialButton.vue";
                 </div>
               </div>
               <div class="card-body">
-                <form role="form" class="text-start">
+                <div role="form" class="text-start">
                   <MaterialInput
                     id="email"
                     class="input-group-outline my-3"
-                    :label="{ text: 'Email', class: 'form-label' }"
+                    placeholder="email"
                     type="email"
                   />
                   <MaterialInput
                     id="password"
                     class="input-group-outline mb-3"
-                    :label="{ text: 'Password', class: 'form-label' }"
+                    placeholder="password"
                     type="password"
                   />
                   <MaterialSwitch
@@ -73,9 +89,9 @@ import MaterialButton from "@/components/MaterialButton.vue";
                     <MaterialButton
                       class="my-4 mb-2"
                       variant="gradient"
-                      color="success"
+                      color="success" @click="loginSubmit"
                       fullWidth
-                      >Sign in</MaterialButton
+                      >Log in</MaterialButton
                     >
                   </div>
                   <p class="mt-4 text-sm text-center">
@@ -86,7 +102,7 @@ import MaterialButton from "@/components/MaterialButton.vue";
                       >Sign up</a
                     >
                   </p>
-                </form>
+                </div>
               </div>
             </div>
           </div>
@@ -96,3 +112,9 @@ import MaterialButton from "@/components/MaterialButton.vue";
       </footer>
     </div>
 </template>
+
+<style>
+.bg {
+  background-image: url(../assets/img/neon.jpeg);
+}
+</style>

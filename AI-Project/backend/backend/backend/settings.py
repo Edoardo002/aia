@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'chatbot',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -75,10 +78,18 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'AIP_DB',
+        'CLIENT': {
+            'host': 'mongodb+srv://oren002:n1Z4SkCUzPYfIWro@aip.mr6qcfe.mongodb.net/?retryWrites=true&w=majority&appName=AIP',
+            'port': 27017,
+            'username': 'oren002',
+            'password': 'n1Z4SkCUzPYfIWro',
+        }
     }
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Password validation
@@ -98,6 +109,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTH_USER_MODEL = "chatbot.User"
 
 
 # Internationalization

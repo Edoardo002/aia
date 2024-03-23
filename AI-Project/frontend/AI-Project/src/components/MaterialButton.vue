@@ -11,6 +11,7 @@ defineProps({
     validator(color) {
       return [
         "primary",
+        "defcolor",
         "secondary",
         "info",
         "success",
@@ -49,7 +50,8 @@ function getClasses(variant, color, size, fullWidth, disabled) {
   } else if (variant === "outline") {
     colorValue = `btn-outline-${color}`;
   } else {
-    colorValue = `btn-${color}`;
+    if (color=="defcolor") colorValue = `${color}`;
+    else colorValue = `btn-${color}`;
   }
 
   sizeValue = size && `btn-${size}`;
@@ -63,9 +65,14 @@ function getClasses(variant, color, size, fullWidth, disabled) {
 </script>
 <template>
   <button
-    class="btn"
+    class="btn text-white"
     :class="getClasses(variant, color, size, fullWidth, disabled)"
   >
     <slot />
   </button>
 </template>
+<style> 
+.btn:hover{
+  background-color: black !important;
+}
+</style>

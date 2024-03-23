@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue'
 import MaterialInput from "@/components/MaterialInput.vue";
 import MaterialSwitch from "@/components/MaterialSwitch.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
+import { dashboard } from '@/assets/js/foundamentals'
 
 async function loginSubmit() {
   var email = document.getElementById("email").value;
@@ -17,11 +17,11 @@ async function loginSubmit() {
   if (response.ok) {
     const data = await response.json();
     console.log(data);
-    alert('logged in...');
+    dashboard(data);
   } else {
     const error = await response.json();
     console.error(error);
-    alert('error...');
+    alert('Invalid e-mail or password');
   }
 }
 </script>
@@ -37,7 +37,7 @@ async function loginSubmit() {
                 class="card-header p-0 position-relative mt-n4 mx-3 z-index-2"
               >
                 <div
-                  class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+                  class="defcolor shadow-success border-radius-lg py-3 pe-1"
                 >
                   <h4
                     class="text-white font-weight-bolder text-center mt-2 mb-0"
@@ -88,8 +88,7 @@ async function loginSubmit() {
                   <div class="text-center">
                     <MaterialButton
                       class="my-4 mb-2"
-                      variant="gradient"
-                      color="success" @click="loginSubmit"
+                      color="defcolor" @click="loginSubmit"
                       fullWidth
                       >Log in</MaterialButton
                     >
@@ -97,8 +96,8 @@ async function loginSubmit() {
                   <p class="mt-4 text-sm text-center">
                     Don't have an account?
                     <a
-                      href="#"
-                      class="text-success text-gradient font-weight-bold"
+                      href="/signup"
+                      class="text-dark text-gradient font-weight-bold"
                       >Sign up</a
                     >
                   </p>
@@ -115,6 +114,9 @@ async function loginSubmit() {
 
 <style>
 .bg {
-  background-image: url(../assets/img/neon.jpeg);
+  background-image: url(../assets/img/black.jpg);
+}
+.defcolor {
+  background-color:rgb(128, 200, 0);
 }
 </style>

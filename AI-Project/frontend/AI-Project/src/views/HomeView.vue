@@ -62,7 +62,7 @@ import { start } from "@/assets/js/foundamentals.js";
               Query and manage your context-aware chatbots using custom data to perform Retrieval Augmented Generation on the best LLMs available. 
             </p>
             <div class="buttons">
-              <MaterialButton color="white" class="mt-4" @click="start()"
+              <MaterialButton color="secondary" class="mt-4" @click="start()"
                 >Get Started</MaterialButton>
               <MaterialButton color="none" class="text-white shadow-none mt-4"
                 >Read more</MaterialButton>

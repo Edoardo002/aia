@@ -37,15 +37,15 @@ function sidebarColl() {
       element.parentElement.classList.remove('open');
     });
     document.querySelectorAll('.menu-item').forEach((el) => {
-      el.childNodes.forEach((chiild) =>{
-        chiild.lastElementChild.style.display = 'none';
+      el.childNodes.forEach((child) =>{
+        child.lastElementChild.style.display = 'none';
       })
     });
   }
   else {
     document.querySelectorAll('.menu-item').forEach((el) => {
-      el.childNodes.forEach((chiild) =>{
-        chiild.lastElementChild.style.display = 'block';
+      el.childNodes.forEach((child) =>{
+        child.lastElementChild.style.display = 'block';
       })
     });
   }
@@ -141,75 +141,40 @@ ismb.forEach((element) => {
                 <li class="menu-item sub-menu">
                   <a href="#">
                     <span class="menu-icon">
-                      <i class="ri-vip-diamond-fill"></i>
+                      <i class="ri-codepen-fill"></i>
                     </span>
-                    <span class="menu-title">Components</span>
+                    <span class="menu-title">My Bots</span>
                     <span class="menu-suffix">
-                      <span class="badge primary">Hot</span>
+                      <span class="badge primary">New</span>
                     </span>
                   </a>
                   <div class="sub-menu-list">
                     <ul>
                       <li class="menu-item">
                         <a href="#">
-                          <span class="menu-title">Grid</span>
-                        </a>
-                      </li>
-                      <li class="menu-item">
-                        <a href="#">
-                          <span class="menu-title">Layout</span>
+                          <span class="menu-title">Contexts</span>
                         </a>
                       </li>
                       <li class="menu-item sub-menu">
                         <a href="#">
-                          <span class="menu-title">Forms</span>
+                          <span class="menu-title">Models</span>
                         </a>
                         <div class="sub-menu-list">
                           <ul>
                             <li class="menu-item">
                               <a href="#">
-                                <span class="menu-title">Input</span>
+                                <span class="menu-title">RAGGed</span>
                               </a>
                             </li>
                             <li class="menu-item">
                               <a href="#">
-                                <span class="menu-title">Select</span>
+                                <span class="menu-title">Base Models</span>
                               </a>
                             </li>
                             <li class="menu-item sub-menu">
                               <a href="#">
-                                <span class="menu-title">More</span>
+                                <span class="menu-title">Create new</span>
                               </a>
-                              <div class="sub-menu-list">
-                                <ul>
-                                  <li class="menu-item">
-                                    <a href="#">
-                                      <span class="menu-title">CheckBox</span>
-                                    </a>
-                                  </li>
-                                  <li class="menu-item">
-                                    <a href="#">
-                                      <span class="menu-title">Radio</span>
-                                    </a>
-                                  </li>
-                                  <li class="menu-item sub-menu">
-                                    <a href="#">
-                                      <span class="menu-title">Want more ?</span>
-                                      <span class="menu-suffix">&#x1F914;</span>
-                                    </a>
-                                    <div class="sub-menu-list">
-                                      <ul>
-                                        <li class="menu-item">
-                                          <a href="#">
-                                            <span class="menu-prefix">&#127881;</span>
-                                            <span class="menu-title">You made it </span>
-                                          </a>
-                                        </li>
-                                      </ul>
-                                    </div>
-                                  </li>
-                                </ul>
-                              </div>
                             </li>
                           </ul>
                         </div>
@@ -222,23 +187,18 @@ ismb.forEach((element) => {
                     <span class="menu-icon">
                       <i class="ri-bar-chart-2-fill"></i>
                     </span>
-                    <span class="menu-title">Charts</span>
+                    <span class="menu-title">Stats</span>
                   </a>
                   <div class="sub-menu-list">
                     <ul>
                       <li class="menu-item">
                         <a href="#">
-                          <span class="menu-title">Pie chart</span>
+                          <span class="menu-title">Utilization</span>
                         </a>
                       </li>
                       <li class="menu-item">
                         <a href="#">
-                          <span class="menu-title">Line chart</span>
-                        </a>
-                      </li>
-                      <li class="menu-item">
-                        <a href="#">
-                          <span class="menu-title">Bar chart</span>
+                          <span class="menu-title">Bills</span>
                         </a>
                       </li>
                     </ul>
@@ -247,92 +207,48 @@ ismb.forEach((element) => {
                 <li class="menu-item sub-menu">
                   <a href="#">
                     <span class="menu-icon">
-                      <i class="ri-shopping-cart-fill"></i>
+                      <i class="ri-calendar-fill"></i>
                     </span>
-                    <span class="menu-title">E-commerce</span>
+                    <span class="menu-title">Settings</span>
                   </a>
                   <div class="sub-menu-list">
                     <ul>
                       <li class="menu-item">
                         <a href="#">
-                          <span class="menu-title">Products</span>
+                          <span class="menu-title">Profile</span>
                         </a>
                       </li>
                       <li class="menu-item">
                         <a href="#">
-                          <span class="menu-title">Orders</span>
-                        </a>
-                      </li>
-                      <li class="menu-item">
-                        <a href="#">
-                          <span class="menu-title">credit card</span>
+                          <span class="menu-title">Payment method</span>
                         </a>
                       </li>
                     </ul>
                   </div>
                 </li>
-                <li class="menu-item sub-menu">
+                <li class="menu-item">
                   <a href="#">
                     <span class="menu-icon">
-                      <i class="ri-global-fill"></i>
+                      <i class="ri-vip-diamond-fill"></i>
                     </span>
-                    <span class="menu-title">Maps</span>
+                    <span class="menu-title">Plan</span>
                   </a>
-                  <div class="sub-menu-list">
-                    <ul>
-                      <li class="menu-item">
-                        <a href="#">
-                          <span class="menu-title">Google maps</span>
-                        </a>
-                      </li>
-                      <li class="menu-item">
-                        <a href="#">
-                          <span class="menu-title">Open street map</span>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
                 </li>
-                <li class="menu-item sub-menu">
-                  <a href="#">
-                    <span class="menu-icon">
-                      <i class="ri-ink-bottle-fill"></i>
-                    </span>
-                    <span class="menu-title">Theme</span>
-                  </a>
-                  <div class="sub-menu-list">
-                    <ul>
-                      <li class="menu-item">
-                        <a href="#">
-                          <span class="menu-title">Dark</span>
-                        </a>
-                      </li>
-                      <li class="menu-item">
-                        <a href="#">
-                          <span class="menu-title">Light</span>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </li>
-                <li class="menu-header" style="padding-top: 20px"><span> EXTRA </span></li>
+                <li class="menu-header" style="padding-top: 20px"><span> MORE </span></li>
                 <li class="menu-item">
                   <a href="#">
                     <span class="menu-icon">
                       <i class="ri-book-2-fill"></i>
                     </span>
-                    <span class="menu-title">Documentation</span>
-                    <span class="menu-suffix">
-                      <span class="badge secondary">Beta</span>
-                    </span>
+                    <span class="menu-title">Examples</span>
                   </a>
                 </li>
                 <li class="menu-item">
                   <a href="#">
                     <span class="menu-icon">
-                      <i class="ri-calendar-fill"></i>
+                      <i class="ri-global-fill"></i>
                     </span>
-                    <span class="menu-title">Calendar</span>
+                    <span class="menu-title">Integrate</span>
                   </a>
                 </li>
                 <li class="menu-item">
@@ -340,7 +256,7 @@ ismb.forEach((element) => {
                     <span class="menu-icon">
                       <i class="ri-service-fill"></i>
                     </span>
-                    <span class="menu-title">Examples</span>
+                    <span class="menu-title">Contact us</span>
                   </a>
                 </li>
               </ul>

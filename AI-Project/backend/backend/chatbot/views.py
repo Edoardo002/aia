@@ -17,6 +17,17 @@ def loadData(request):
 
 @api_view(['POST'])
 @csrf_exempt
+def checkAuthentication(request):
+    print('Checking...')
+    user_id = request.data.get('user_id')
+    user_obj = User.objects.get(id=user_id)
+    if User(user_obj).is_authenticated:
+        return Response({'success': 'okay'}, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@csrf_exempt
 def login_view(request):
     print('Loggin in...')
     email = request.data.get('email')

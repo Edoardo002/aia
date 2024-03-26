@@ -2,7 +2,7 @@
 import MaterialInput from "@/components/MaterialInput.vue";
 import MaterialSwitch from "@/components/MaterialSwitch.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
-import { dashboard } from '@/assets/js/foundamentals'
+import { dashboard, sign } from '@/assets/js/foundamentals'
 
 async function loginSubmit() {
   var email = document.getElementById("email").value;
@@ -96,8 +96,9 @@ async function loginSubmit() {
                   <p class="mt-4 text-sm text-center">
                     Don't have an account?
                     <a
-                      href="/signup"
+                      href=""
                       class="text-dark text-gradient font-weight-bold"
+                      @click="sign"
                       >Sign up</a
                     >
                   </p>

@@ -5,6 +5,14 @@ import { slideToggle, slideUp, slideDown } from '@/assets/js/libs/slide';
 import { ANIMATION_DURATION } from '@/assets/js/libs/constants';
 import Poppers from '@/assets/js/libs/poppers';
 import { onMounted } from 'vue';
+import { start, checkAuth} from '@/assets/js/foundamentals';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const user_id = route.params.id;
+
+if (checkAuth(user_id)) {}
+else start();
 
 const PoppersInstance = new Poppers();
 /**
@@ -16,25 +24,31 @@ const updatePoppersTimeout = () => {
   }, ANIMATION_DURATION);
 };
 
-const fsmb = document.querySelectorAll(
-  '.menu > ul > .menu-item.sub-menu > a'
-);
-
-const ismb = document.querySelectorAll(
-  '.menu > ul > .menu-item.sub-menu .menu-item.sub-menu > a'
-);
-
 /**
  * sidebar collapse handler
  */
 function sidebarColl() {
   document.getElementById('sidebar').classList.toggle('collapsed');
   PoppersInstance.closePoppers();
-  if (document.getElementById('sidebar').classList.contains('collapsed'))
-    fsmb.forEach((element) => {
+  if (document.getElementById('sidebar').classList.contains('collapsed')) {
+    document.querySelectorAll(
+      '.menu > ul > .menu-item.sub-menu > a'
+    ).forEach((element) => {
       element.parentElement.classList.remove('open');
     });
-
+    document.querySelectorAll('.menu-item').forEach((el) => {
+      el.childNodes.forEach((chiild) =>{
+        chiild.lastElementChild.style.display = 'none';
+      })
+    });
+  }
+  else {
+    document.querySelectorAll('.menu-item').forEach((el) => {
+      el.childNodes.forEach((chiild) =>{
+        chiild.lastElementChild.style.display = 'block';
+      })
+    });
+  }
   updatePoppersTimeout();
 };
 
@@ -43,7 +57,7 @@ function sidebarColl() {
  */
 function sidebarHandler() {
   document.getElementById('sidebar').classList.toggle('toggled');
-
+  
   updatePoppersTimeout();
 };
 
@@ -56,12 +70,19 @@ function overlay() {
 
 onMounted(() => {
 
-const defaultOpenMenus = document.querySelectorAll('.menu-item.sub-menu.open');
+  const fsmb = document.querySelectorAll(
+  '.menu > ul > .menu-item.sub-menu > a'
+);
 
-defaultOpenMenus.forEach((element) => {
+  const ismb = document.querySelectorAll(
+  '.menu > ul > .menu-item.sub-menu .menu-item.sub-menu > a'
+);
+
+  const defaultOpenMenus = document.querySelectorAll('.menu-item.sub-menu.open');
+  
+  defaultOpenMenus.forEach((element) => {
   element.lastElementChild.style.display = 'block';
 });
-
 /**
  * handle top level submenu click
  */
@@ -109,8 +130,8 @@ ismb.forEach((element) => {
         <div class="sidebar-layout">
           <div class="sidebar-header">
             <div class="pro-sidebar-logo">
-              <div>P</div>
-              <h5>Pro Sidebar</h5>
+              <div>A</div>
+              <h5>AI-Project</h5>
             </div>
           </div>
           <div class="sidebar-content">
@@ -336,17 +357,14 @@ ismb.forEach((element) => {
             <a id="btn-toggle" href="#" class="sidebar-toggler break-point-lg" @click="sidebarHandler">
               <i class="ri-menu-line ri-xl"></i>
             </a>
-            <h1 style="margin-bottom: 0">Pro Sidebar</h1>
+            <h1 style="margin-bottom: 0">Models</h1>
             <span style="display: inline-block; margin-bottom: 10px">
-              Responsive layout with advanced sidebar menu built with SCSS and vanilla Javascript
+              Here your context-aware models. If you have not created one yet, start the process by clicking on Create
             </span>
-          </div>
-          <div>
-            <h2>Features</h2>
           </div>
         </main>
         <div class="overlay"></div>
       </div>
     </div>
 
-</template>../assets/libs/slide../assets/libs/constants../assets/libs/poppers
+</template>

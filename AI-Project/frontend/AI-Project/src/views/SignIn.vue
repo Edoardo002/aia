@@ -1,8 +1,8 @@
-<script setup>
+k<script setup>
 import MaterialInput from "@/components/MaterialInput.vue";
 import MaterialSwitch from "@/components/MaterialSwitch.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
-import { dashboard, sign } from '@/assets/js/foundamentals'
+import { dashboard, sign } from '@/assets/js/foundamentals';
 
 async function loginSubmit() {
   var email = document.getElementById("email").value;
@@ -27,8 +27,8 @@ async function loginSubmit() {
 </script>
 <template>
     <div
-      class="page-header align-items-start min-vh-100 bg">
-      <span class="mask bg-gradient-dark opacity-6"></span>
+      class="page-header align-items-start min-vh-100 back">
+      <span class="mask bg-dark opacity-6"></span>
       <div class="container my-auto">
         <div class="row">
           <div class="col-lg-4 col-md-8 col-12 mx-auto">
@@ -88,7 +88,7 @@ async function loginSubmit() {
                   <div class="text-center">
                     <MaterialButton
                       class="my-4 mb-2"
-                      color="defcolor" @click="loginSubmit"
+                      color="dark" @click="loginSubmit"
                       fullWidth
                       >Log in</MaterialButton
                     >
@@ -96,7 +96,6 @@ async function loginSubmit() {
                   <p class="mt-4 text-sm text-center">
                     Don't have an account?
                     <a
-                      href=""
                       class="text-dark text-gradient font-weight-bold"
                       @click="sign"
                       >Sign up</a
@@ -114,7 +113,7 @@ async function loginSubmit() {
 </template>
 
 <style>
-.bg {
+.back {
   background-image: url(../assets/img/black.jpg);
 }
 .defcolor {

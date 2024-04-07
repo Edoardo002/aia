@@ -8,7 +8,7 @@ import { start } from "@/assets/js/foundamentals.js";
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark navbar-absolute bg-transparent shadow-none" >
       <div class="container">
-        <a class="navbar-brand text-white" href="javascript:;">AI project</a>
+        <a class="navbar-brand text-white" href="javascript:;">CogiTCH</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -53,7 +53,7 @@ import { start } from "@/assets/js/foundamentals.js";
     </nav>
 
     <div class="page-header min-vh-100 bg">
-      <span class="mask bg-gradient-dark opacity-5"></span>
+      <span class="mask bg-dark opacity-6"></span>
       <div class="container">
         <div class="row">
           <div class="col-lg-6 col-md-7 d-flex justify-content-center flex-column">
@@ -62,7 +62,7 @@ import { start } from "@/assets/js/foundamentals.js";
               Query and manage your context-aware chatbots using custom data to perform Retrieval Augmented Generation on the best LLMs available. 
             </p>
             <div class="buttons">
-              <MaterialButton color="secondary" class="mt-4" @click="start()"
+              <MaterialButton color="dark" class="mt-4" @click="start()"
                 >Get Started</MaterialButton>
               <MaterialButton color="none" class="text-white shadow-none mt-4"
                 >Read more</MaterialButton>

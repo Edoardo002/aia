@@ -2,7 +2,7 @@
 import MaterialInput from "@/components/MaterialInput.vue";
 import MaterialSwitch from "@/components/MaterialSwitch.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
-import { dashboard } from '@/assets/js/foundamentals'
+import { dashboard } from '@/assets/js/foundamentals';
 
 async function signupSubmit() {
   var email = document.getElementById("email").value;
@@ -29,8 +29,8 @@ async function signupSubmit() {
 </script>
 <template>
     <div
-      class="page-header align-items-start min-vh-100 bg">
-      <span class="mask bg-gradient-dark opacity-6"></span>
+      class="page-header align-items-start min-vh-100 back">
+      <span class="mask bg-dark opacity-6"></span>
       <div class="container my-auto">
         <div class="row">
           <div class="col-lg-4 col-md-8 col-12 mx-auto">
@@ -102,7 +102,7 @@ async function signupSubmit() {
                   <div class="text-center">
                     <MaterialButton
                       class="my-4 mb-2"
-                      color="defcolor" @click="signupSubmit"
+                      color="dark" @click="signupSubmit"
                       fullWidth
                       >Sign up</MaterialButton
                     >
@@ -127,7 +127,7 @@ async function signupSubmit() {
 </template>
 
 <style>
-.bg {
+.back {
   background-image: url(../assets/img/black.jpg);
 }
 .defcolor {

@@ -1,12 +1,14 @@
 <script setup>
 
 import '@/assets/style/styles.scss';
+import '@/assets/css/base.css'
 import { slideToggle, slideUp, slideDown } from '@/assets/js/libs/slide';
 import { ANIMATION_DURATION } from '@/assets/js/libs/constants';
 import Poppers from '@/assets/js/libs/poppers';
 import { onMounted } from 'vue';
 import { start, checkAuth} from '@/assets/js/foundamentals';
 import { useRoute } from 'vue-router';
+import CardElement from '@/components/CardElement.vue'
 
 const route = useRoute();
 const user_id = route.params.id;
@@ -130,8 +132,8 @@ ismb.forEach((element) => {
         <div class="sidebar-layout">
           <div class="sidebar-header">
             <div class="pro-sidebar-logo">
-              <div>A</div>
-              <h5>AI-Project</h5>
+              <div>C</div>
+              <h5>CogiTCH</h5>
             </div>
           </div>
           <div class="sidebar-content">
@@ -277,6 +279,9 @@ ismb.forEach((element) => {
             <span style="display: inline-block; margin-bottom: 10px">
               Here your context-aware models. If you have not created one yet, start the process by clicking on Create
             </span>
+
+            <CardElement></CardElement>
+
           </div>
         </main>
         <div class="overlay"></div>

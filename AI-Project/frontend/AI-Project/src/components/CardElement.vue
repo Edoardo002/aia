@@ -6,37 +6,29 @@
 
 <div class="card-container">
       <a href="/" class="hero-image-container">
-        <img class="hero-image" src="https://i.postimg.cc/NfR2yhNs/image-equilibrium.jpg" alt="Spinning glass cube"/>
+        <img class="hero-image" src="https://appmaster.io/api/_files/oeHrNPjB9CSUTM4HTfypjP/download/" alt="Spinning glass cube"/>
       </a>
       <main class="main-content">
-        <h1><a href="#">Equilibrium #3429</a></h1>
-        <p>Our Equilibrium collection promotes balance and calm.</p>
+        <h1>Chatbot 1</h1>
+        <p>Description of the chatbot</p>
         <div class="flex-row">
           <div class="coin-base">
-            <img src="https://i.postimg.cc/T1F1K0bW/Ethereum.png" alt="Ethereum" class="small-image"/>
-            <h2>0.041 ETH</h2>
+            <img src="https://cdn-icons-png.freepik.com/256/10321/10321703.png" alt="Ethereum" class="small-image"/>
+            <h2>OpenAI</h2>
           </div>
           <div class="time-left">
             <img src="https://i.postimg.cc/prpyV4mH/clock-selection-no-bg.png" alt="clock" class="small-image"/>
-            <p>3 days left</p>
+            <p>2 hours ago</p>
           </div>
         </div>
       </main>
-      <div class="card-attribute">
-        <img src="https://i.postimg.cc/SQBzNQf1/image-avatar.png" alt="avatar" class="small-avatar"/>
-        <p>Creation of <span><a href="#">Jules Wyvern</a></span></p>
-      </div>
-</div>
-<div class="attribution">
-    Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>. 
-    Coded by <a href="#">Lauro235</a>.
 </div>
 
 </template>
 
 <style>
 /* 
-
+s
 Eye view
 
 https://i.postimg.cc/9MtT4GZY/view.png' border='0' alt='view */
@@ -50,18 +42,21 @@ Font Styling
 h1 {
     font: var(--var-heading);
     color: var(--var-lightest);
-    padding: 1.2em 0;
+    padding-bottom: 0.2em;
+    padding-top: 0.5rem;
 }
 
 h2 {
     font: var(--var-small-heading);
     color: var(--var-lightest);
+    padding-top: 0.2rem;
     /* padding on .coin-base */
 }
 
 p {
     font: var(--var-para);
     color: var(--var-soft-blue);
+    padding-top: 0.2rem;
 }
 
 span {
@@ -76,18 +71,18 @@ Classes
 /* LAYOUT */
 
 .card-container {
-    width: 30%;
+    width: 100%;
     max-width: 400px;
     margin: 2em auto;
     background-color: var(--var-card-dark);
     border-radius: 15px;
     margin-bottom: 1rem;
-    padding: 2rem;
+    padding: 1.5rem;
 	background-image: linear-gradient(
 		135deg,
-		#752e7c 1%,
-		#734a58 10%,
-		#1b2028 30%,
+		#752e7c,
+		#734a58 1%,
+		#1b2028 4%,
 		hsl(216, 50%, 16%) 100%
 	);
 }
@@ -95,18 +90,13 @@ Classes
 div.flex-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: start;
 }
 
 div.coin-base, .time-left, .card-attribute {
     display: flex;
-    align-items:center;
-    padding: 1em 0;
-}
-
-.card-attribute {
-    padding-bottom: 1.5em;
-    border-top: 2px solid var(--var-line-dark);
+    align-items:start;
+    padding: 0.2rem
 }
 
 a.hero-image-container {
@@ -157,31 +147,19 @@ img.eye {
 
 .small-image {
     width: 1.2em;
-    margin-right: .5em;
+    margin-right: 0.5em;
 }
 
 .small-avatar {
     width: 2em;
     border-radius: 200px;
     outline: 2px solid white;
-    margin-right: 1.4em;
-}
-
-div.attribution {
-    margin: 0 auto;
-    width: 100%;
-    font: var(--var-para);
-    text-align: center;
-    padding: 1.5em 0 4em 0;
-    color: var(--var-line-dark);
-}
-.attribution a {
-    color: var(--var-soft-blue);
+    margin-right: .4em;
 }
 
 @media (min-width:600px) {
     body {
-        font-size: 18px;
+        font-size: 10;
     }
 }
 </style>

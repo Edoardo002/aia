@@ -17,11 +17,11 @@ Variables
     
     /* Fonts */
     
-    --var-heading: normal normal 600 1.5em/1.6em 'Outfit', sans-serif;
+    --var-heading: normal normal 600 1.2em/1.55em 'Outfit', sans-serif;
     
-    --var-small-heading: normal normal 400 1em/1em 'Outfit', sans-serif;
+    --var-small-heading: normal normal 400 0.8em/0.9em 'Outfit', sans-serif;
     
-    --var-para: normal normal 300 1em/1.55em 'Outfit', sans-serif;
+    --var-para: normal normal 300 0.8em/0.9em 'Outfit', sans-serif;
 }
 
 /* 
@@ -52,3 +52,15 @@ img {
 a {
     color: inherit;
 }
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    background-color: transparent;
+    padding: 0.5rem
+  }
+  .grid-item {
+    background-color: transparent;
+    text-align: start;
+    padding: 0.5rem
+  }

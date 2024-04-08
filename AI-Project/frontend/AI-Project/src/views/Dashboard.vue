@@ -280,7 +280,10 @@ ismb.forEach((element) => {
               Here your context-aware models. If you have not created one yet, start the process by clicking on Create
             </span>
 
-            <CardElement></CardElement>
+            <div class="grid-container">
+              <div class="grid-item"><CardElement></CardElement></div>
+              <div class="grid-item"><CardElement></CardElement></div>
+            </div>
 
           </div>
         </main>

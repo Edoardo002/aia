@@ -1,14 +1,17 @@
 <script setup>
 
 import '@/assets/style/styles.scss';
-import '@/assets/css/base.css'
+import '@/assets/css/base.css';
+import * as Logic from '@/assets/js/triggerLogic';
 import { slideToggle, slideUp, slideDown } from '@/assets/js/libs/slide';
 import { ANIMATION_DURATION } from '@/assets/js/libs/constants';
 import Poppers from '@/assets/js/libs/poppers';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { start, checkAuth} from '@/assets/js/foundamentals';
 import { useRoute } from 'vue-router';
-import CardElement from '@/components/CardElement.vue'
+import ModelCardElement from '@/components/ModelCardElement.vue'
+import ContextCardElement from '@/components/ContextCardElement.vue'
+import MaterialButton from "@/components/MaterialButton.vue";
 
 const route = useRoute();
 const user_id = route.params.id;
@@ -120,6 +123,42 @@ ismb.forEach((element) => {
 });
 
 })
+
+const showRAGged = ref(true);
+const showContext = ref(false);
+const showBase = ref(false);
+const showCreateNew = ref(false);
+const showUtilization = ref(false);
+const showBills = ref(false);
+const showProfile= ref(false);
+const showPaymentMethod = ref(false);
+const showPlan = ref(false);
+
+function clear(){
+  showRAGged.value = false;
+  showContext.value = false;
+  showBase.value = false;
+  showCreateNew.value = false;
+  showUtilization.value= false;
+  showBills.value = false;
+  showProfile.value = false;
+  showPaymentMethod.value = false;
+  showPlan.value = false;
+}
+
+function changeFrame(frame) {
+  clear();
+  if (frame==0) showContext.value=true;
+  else if (frame==1) showRAGged.value=true;
+  else if (frame==2) showBase.value=true;
+  else if (frame==3) showCreateNew.value=true;
+  else if (frame==4) showUtilization.value=true;
+  else if (frame==5) showBills.value=true;
+  else if (frame==6) showProfile.value=true;
+  else if (frame==7) showPaymentMethod.value=true;
+  else showPlan.value=true;
+}
+
 </script>
 <template>
 
@@ -153,7 +192,7 @@ ismb.forEach((element) => {
                   <div class="sub-menu-list">
                     <ul>
                       <li class="menu-item">
-                        <a href="#">
+                        <a @click="changeFrame(0)" href="#">
                           <span class="menu-title">Contexts</span>
                         </a>
                       </li>
@@ -164,17 +203,17 @@ ismb.forEach((element) => {
                         <div class="sub-menu-list">
                           <ul>
                             <li class="menu-item">
-                              <a href="#">
-                                <span class="menu-title">RAGGed</span>
+                              <a @click="changeFrame(1)" href="#">
+                                <span class="menu-title">RAGged</span>
                               </a>
                             </li>
                             <li class="menu-item">
-                              <a href="#">
+                              <a @click="changeFrame(2)" href="#">
                                 <span class="menu-title">Base Models</span>
                               </a>
                             </li>
-                            <li class="menu-item sub-menu">
-                              <a href="#">
+                            <li class="menu-item">
+                              <a @click="changeFrame(3)" href="#">
                                 <span class="menu-title">Create new</span>
                               </a>
                             </li>
@@ -194,12 +233,12 @@ ismb.forEach((element) => {
                   <div class="sub-menu-list">
                     <ul>
                       <li class="menu-item">
-                        <a href="#">
+                        <a @click="changeFrame(4)" href="#">
                           <span class="menu-title">Utilization</span>
                         </a>
                       </li>
                       <li class="menu-item">
-                        <a href="#">
+                        <a @click="changeFrame(5)" href="#">
                           <span class="menu-title">Bills</span>
                         </a>
                       </li>
@@ -216,12 +255,12 @@ ismb.forEach((element) => {
                   <div class="sub-menu-list">
                     <ul>
                       <li class="menu-item">
-                        <a href="#">
+                        <a @click="changeFrame(6)" href="#">
                           <span class="menu-title">Profile</span>
                         </a>
                       </li>
                       <li class="menu-item">
-                        <a href="#">
+                        <a @click="changeFrame(7)" href="#">
                           <span class="menu-title">Payment method</span>
                         </a>
                       </li>
@@ -229,7 +268,7 @@ ismb.forEach((element) => {
                   </div>
                 </li>
                 <li class="menu-item">
-                  <a href="#">
+                  <a @click="changeFrame(8)" href="#">
                     <span class="menu-icon">
                       <i class="ri-vip-diamond-fill"></i>
                     </span>
@@ -275,16 +314,40 @@ ismb.forEach((element) => {
             <a id="btn-toggle" href="#" class="sidebar-toggler break-point-lg" @click="sidebarHandler">
               <i class="ri-menu-line ri-xl"></i>
             </a>
+
+            <Transition mode="out-in">
+              
+            <div v-if="showRAGged">
             <h1 style="margin-bottom: 0">Models</h1>
             <span style="display: inline-block; margin-bottom: 10px">
               Here your context-aware models. If you have not created one yet, start the process by clicking on Create
             </span>
+            
+            <MaterialButton color="secondary" class="ms-4 mt-3" @click="Logic.addNewModel()"
+                > + Create</MaterialButton>
+
+            
+            <div class="grid-container">
+              <div class="grid-item"><ModelCardElement model-name="AAA"></ModelCardElement></div>
+            </div>
+            </div>
+          
+            <div v-else-if="showContext">
+            <h1 style="margin-bottom: 0">Contexts</h1>
+            <span style="display: inline-block; margin-bottom: 10px">
+              Here your uploaded Contexts. If you have not created one yet, start the process by clicking on Add
+            </span>
+            
+            <MaterialButton color="secondary" class="ms-4 mt-3" @click="Logic.addNewContext()"
+                > + Add</MaterialButton>
 
             <div class="grid-container">
-              <div class="grid-item"><CardElement></CardElement></div>
-              <div class="grid-item"><CardElement></CardElement></div>
+              <div class="grid-item"><ContextCardElement context-name="BBB"></ContextCardElement></div>
             </div>
-
+            </div>
+            
+          </Transition>
+          
           </div>
         </main>
         <div class="overlay"></div>
@@ -292,3 +355,17 @@ ismb.forEach((element) => {
     </div>
 
 </template>
+
+<style>
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
+</style>

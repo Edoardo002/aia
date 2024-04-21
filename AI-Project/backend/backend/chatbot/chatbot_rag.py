@@ -1,7 +1,7 @@
 import os
 import sys
 import constants
-import pymongo, pprint
+import pymongo, pprint, getpass
 
 from langchain_community.document_loaders import DirectoryLoader
 from langchain.indexes import VectorstoreIndexCreator
@@ -10,6 +10,9 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_mongodb import MongoDBAtlasVectorSearch
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+#from langchain_cohere import ChatCohere
+#from langchain_community.llms import bedrock
+#sfrom langchain_core.messages import HumanMessage
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from pymongo import MongoClient
@@ -17,8 +20,9 @@ from pymongo import MongoClient
 # from langchain_community.llms import openai
 # from langchain_community.chat_models import AzureChatOpenAI
 
-os.environ["OPENAI_API_KEY"] = constants.APIKEY
+os.environ["OPENAI_API_KEY"] = constants.APIKEY # TODO - encrypt
 # os.environ["OPENAI_API_TYPE"] = "azure"
+#os.environ["COHERE_API_KEY"] = getpass.getpass()
 ATLAS_CONNECTION_STRING = constants.ATLASSRV
 
 # Connect to your Atlas cluster
@@ -70,6 +74,9 @@ Question: {question}
 custom_rag_prompt = PromptTemplate.from_template(template)
 
 llm = ChatOpenAI()
+#llm = bedrock(
+#    credentials_profile_name="bedrock-admin", model_id="amazon.titan-text-express-v1"
+#)
 
 def format_docs(docs):
    return "\n\n".join(doc.page_content for doc in docs)
@@ -83,7 +90,7 @@ rag_chain = (
 )
 
 # Prompt the chain
-question = sys.argv[1] # whre to retrieve the input question has to change
+question = sys.argv[1] # where to retrieve the input question has to change
 answer = rag_chain.invoke(question)
 
 print("Question: " + question)

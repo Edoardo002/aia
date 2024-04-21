@@ -1,5 +1,12 @@
 <script setup>
 
+defineProps({
+  modelName: String,
+  modelDescription: String,
+  modelType: String,
+  modelId: String
+})
+
 </script>
 
 <template>
@@ -9,7 +16,7 @@
         <img class="hero-image" src="https://appmaster.io/api/_files/oeHrNPjB9CSUTM4HTfypjP/download/" alt="Spinning glass cube"/>
       </a>
       <main class="main-content">
-        <h1>Chatbot 1</h1>
+        <h1>{{ modelName }}</h1>
         <p>Description of the chatbot</p>
         <div class="flex-row">
           <div class="coin-base">
@@ -80,9 +87,9 @@ Classes
     padding: 1.5rem;
 	background-image: linear-gradient(
 		135deg,
-		#752e7c,
-		#734a58 1%,
-		#1b2028 4%,
+		#586164,
+		#4a5b73 0.5%,
+		#3a4555 2%,
 		hsl(216, 50%, 16%) 100%
 	);
 }

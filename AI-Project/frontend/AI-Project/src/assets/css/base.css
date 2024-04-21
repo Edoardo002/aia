@@ -57,10 +57,10 @@ a {
     display: grid;
     grid-template-columns: auto auto auto;
     background-color: transparent;
-    padding: 0.5rem
+    padding: 0.4rem
   }
   .grid-item {
     background-color: transparent;
     text-align: start;
-    padding: 0.5rem
+    padding: 0.4rem
   }

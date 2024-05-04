@@ -12,12 +12,16 @@ import { useRoute } from 'vue-router';
 import ModelCardElement from '@/components/ModelCardElement.vue'
 import ContextCardElement from '@/components/ContextCardElement.vue'
 import MaterialButton from "@/components/MaterialButton.vue";
+import MaterialInput from '@/components/MaterialInput.vue';
+import Modal from '@/components/Modal.vue'
 
 const route = useRoute();
 const user_id = route.params.id;
+const contexts_array = ref([]);
 
-if (checkAuth(user_id)) {}
-else start();
+checkAuth(user_id).then((auth) => {
+  if (!auth) start();
+});
 
 const PoppersInstance = new Poppers();
 /**
@@ -124,6 +128,14 @@ ismb.forEach((element) => {
 
 })
 
+Logic.getContexts(user_id).then((data) => {
+  const temp = [data];
+  temp.forEach((item) => {
+    // edit contexts' names;
+  });
+  contexts_array.value = data;
+});
+
 const showRAGged = ref(true);
 const showContext = ref(false);
 const showBase = ref(false);
@@ -133,6 +145,9 @@ const showBills = ref(false);
 const showProfile= ref(false);
 const showPaymentMethod = ref(false);
 const showPlan = ref(false);
+
+const urlNotUploaded = ref(true);
+const filesNotUploaded = ref(true);
 
 function clear(){
   showRAGged.value = false;
@@ -157,6 +172,14 @@ function changeFrame(frame) {
   else if (frame==6) showProfile.value=true;
   else if (frame==7) showPaymentMethod.value=true;
   else showPlan.value=true;
+}
+
+function onFileUpload() {
+  filesNotUploaded.value=false;
+}
+
+function onUrlUpload() {
+  urlNotUploaded.value=false;
 }
 
 </script>
@@ -322,10 +345,20 @@ function changeFrame(frame) {
             <span style="display: inline-block; margin-bottom: 10px">
               Here your context-aware models. If you have not created one yet, start the process by clicking on Create
             </span>
-            
-            <MaterialButton color="secondary" class="ms-4 mt-3" @click="Logic.addNewModel()"
-                > + Create</MaterialButton>
 
+            <Modal button-message="+ Create">
+              <h2>Create a new Model</h2>
+	            <p>Choose a large language model to RAG with your context and query</p>
+              <fieldset>
+              <h2>Select a context</h2>
+              <label v-for="item in contexts_array" class="rad-label">
+                <input type="radio" class="rad-input" name="rad" value="">
+                <div class="rad-design"></div>
+                <div class="rad-text">{{ item }}</div>
+              </label>
+              </fieldset>
+              <h2 class="mt-2">Select a Model</h2>
+            </Modal>
             
             <div class="grid-container">
               <div class="grid-item"><ModelCardElement model-name="AAA"></ModelCardElement></div>
@@ -337,9 +370,20 @@ function changeFrame(frame) {
             <span style="display: inline-block; margin-bottom: 10px">
               Here your uploaded Contexts. If you have not created one yet, start the process by clicking on Add
             </span>
-            
-            <MaterialButton color="secondary" class="ms-4 mt-3" @click="Logic.addNewContext()"
-                > + Add</MaterialButton>
+
+            <Modal button-message="+ Add">
+              <h2>Upload your context</h2>
+	            <p>Here you can store your documents by selecting files from your device or linking a Sharepoint repository</p>
+              <MaterialInput id="inputContext"
+                    class="input-group-outline mb-3"
+                    placeholder="Sharepoint URL"
+                    type="url" v-on:input="onUrlUpload"> </MaterialInput>
+              <MaterialButton id="sharebtn" color="secondary" :disabled="urlNotUploaded"
+                >use sharepoint</MaterialButton>
+              <input id="userFiles" type="file" accept=".doc, .docx, .txt, .pdf" v-on:change="onFileUpload" multiple>
+              <MaterialButton id="uploadbtn" color="secondary" :disabled="filesNotUploaded" @click="Logic.addNewContext(user_id)"
+                >upload</MaterialButton>
+            </Modal>
 
             <div class="grid-container">
               <div class="grid-item"><ContextCardElement context-name="BBB"></ContextCardElement></div>
@@ -366,6 +410,38 @@ function changeFrame(frame) {
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+
+h2 {
+	font-weight: 600;
+	font-size: 1.5rem;
+	padding-bottom: 1rem;
+}
+
+p {
+	font-size: 1rem;
+	line-height: 1.3rem;
+	padding: 0.5rem 0;
+}
+
+input {
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+input::file-selector-button {
+  font-weight: bold;
+  font-family: sans-serif;
+  text-transform: uppercase;
+  color: #ffffff;
+  background-color: rgb(128, 200, 0);
+  padding-left: 1.4rem;
+  padding-right: 1.4rem;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  border: thin solid hsl(215, 32%, 27%, 0.5);
+  border-radius: 8px;
+  font-size: 0.8rem;
 }
 
 </style>

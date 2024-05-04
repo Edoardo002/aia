@@ -8,12 +8,8 @@ from rest_framework import status
 from .models import User
 from .models import UserManager
 from .serializers import UserSerializer
-
-def queryChatbot(request):
-    return HttpResponse("")
-
-def loadData(request):
-    return HttpResponse("OK")
+from datetime import datetime
+from datetime import timedelta
 
 @api_view(['POST'])
 @csrf_exempt
@@ -21,10 +17,12 @@ def checkAuthentication(request):
     print('Checking...')
     user_id = request.data.get('user_id')
     user_obj = User.objects.get(id=user_id)
-    if User(user_obj).is_authenticated:
+    today = datetime.today()
+    limit = today - timedelta(hours=4)
+    if user_obj.last_login.timestamp() > limit.timestamp():
         return Response({'success': 'okay'}, status=status.HTTP_200_OK)
     else:
-        return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'session expired'}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
 @csrf_exempt

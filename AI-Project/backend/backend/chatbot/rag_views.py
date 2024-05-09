@@ -1,4 +1,5 @@
 import os
+import json
 from pathlib import Path
 from . import constants
 from django.http import HttpResponse
@@ -10,9 +11,27 @@ from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_mongodb import MongoDBAtlasVectorSearch
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from pymongo import MongoClient
+from langchain.chains.history_aware_retriever import create_history_aware_retriever
+from langchain.chains.retrieval import create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain.chains.loading import load_chain
+from bson.json_util import dumps
+from bson.json_util import loads
 
+# Statefully manage chat history
+store = {}
+# Statefully manage chains
+chains = {}
+# Constant variables
+AIP_DB = constants.AIPDB
+ATLAS_CONNECTION_STRING = constants.ATLASSRV
+os.environ["OPENAI_API_KEY"] = constants.APIKEY # TODO - encrypt
 
 @api_view(['POST'])
 @csrf_exempt
@@ -22,17 +41,15 @@ def loadContext(request):
     context_name = request.data.get('context_name')
     context = request.data.get('context')
 
-    to_file(context)
+    to_file(context, user_id)
 
-    os.environ["OPENAI_API_KEY"] = constants.APIKEY # TODO - encrypt
-    ATLAS_CONNECTION_STRING = constants.ATLASSRV
     client = MongoClient(ATLAS_CONNECTION_STRING)
     db_name = "langchain_db"
     collection_name = user_id+"_"+context_name
     atlas_collection = client[db_name][collection_name]
     vector_search_index = "vector_index"
 
-    loader = DirectoryLoader("data", glob="*.*", show_progress=True)
+    loader = DirectoryLoader("data/"+user_id, glob="*.*", show_progress=True)
     data = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
     docs = text_splitter.split_documents(data)
@@ -46,18 +63,18 @@ def loadContext(request):
         index_name = vector_search_index
     )
     
-    delete_file()
+    delete_context_file(user_id)
       
-    return HttpResponse("OK")
+    return HttpResponse(status.HTTP_200_OK)
 
-def to_file(content):
-    output_file = Path("data/context.txt")
+def to_file(content, id):
+    output_file = Path("data/"+id+"/context.txt")
     output_file.parent.mkdir(exist_ok=True, parents=True)
     output_file.write_text(content)
     return 
 
-def delete_file():
-    os.remove("data/context.txt")
+def delete_context_file(id):
+    os.remove("data/"+id+"/context.txt")
 
 @api_view(['POST'])
 @csrf_exempt
@@ -65,7 +82,6 @@ def getContexts(request):
     print('getting Contexts...')
     user_id = request.data.get('user_id')
 
-    ATLAS_CONNECTION_STRING = constants.ATLASSRV
     client = MongoClient(ATLAS_CONNECTION_STRING)
     db_name = "langchain_db"
     db = client.get_database(db_name)
@@ -73,3 +89,115 @@ def getContexts(request):
     collection = db.list_collection_names(filter=user_filter)
     collection.sort()
     return Response(collection, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@csrf_exempt
+def addModel(request):
+    print('adding Model...')
+    user_id = request.data.get('user_id')
+    context_name = request.data.get('context_name')
+    model = request.data.get('model')
+
+    client = MongoClient(ATLAS_CONNECTION_STRING)
+    db_name = "langchain_db"
+    db = client.get_database(db_name)
+    filter = {"name": {"$regex": context_name}}
+    coll = db.list_collection_names(filter=filter)[0]
+    atlas_collection = client[db_name][coll]
+
+    clientAipDb = MongoClient(host=AIP_DB, port=27017)
+    aip_coll_name = "ragchains"
+    aip_db = clientAipDb.get_database("AIP_DB")
+    aip_collection = aip_db.get_collection(aip_coll_name)
+
+    vectorstore = MongoDBAtlasVectorSearch(
+        embedding = OpenAIEmbeddings(disallowed_special=()),
+        collection = atlas_collection,
+        index_name = "vector_index"
+    )
+
+    if (model=="openai"):
+        os.environ["OPENAI_API_KEY"] = constants.APIKEY # TODO - encrypt
+        retriever = vectorstore.as_retriever(
+        search_type = "similarity",
+        search_kwargs = {"k": 10, "score_threshold": 0.75})
+
+        template = """
+        Using your context to answer the question at the end.
+        This chatbot also remebers what it previously answered to you.
+        {context}
+        Question: {question}
+        """
+
+        llm = ChatOpenAI()
+
+        custom_rag_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", template),
+                MessagesPlaceholder("chat_history"),
+                ("human", "{input}"),
+            ]
+        )
+        history_aware_retriever = create_history_aware_retriever(
+            llm, retriever, custom_rag_prompt
+        )
+        question_answer_chain = create_stuff_documents_chain(llm, custom_rag_prompt)
+        rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
+        
+        conversational_rag_chain = RunnableWithMessageHistory(
+            rag_chain,
+            get_session_history,
+            input_messages_key="input",
+            history_messages_key="chat_history",
+            output_messages_key="answer",
+        )
+
+        chains[user_id+model+'_'+context_name ] = conversational_rag_chain
+         
+        result = aip_collection.insert_one({ "user" : user_id, "model_name" : model+'_'+context_name })
+
+        if(result):
+            return HttpResponse(status.HTTP_200_OK)
+        else:
+            return HttpResponse(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+def get_session_history(session_id: str) -> BaseChatMessageHistory:
+    if session_id not in store:
+        store[session_id] = ChatMessageHistory()
+    return store[session_id]
+
+@api_view(['POST'])
+@csrf_exempt
+def getModels(request):
+    print('getting Models...')
+    user_id = request.data.get('user_id')
+
+    clientAipDb = MongoClient(host=AIP_DB, port=27017)
+    aip_coll_name = "ragchains"
+    aip_db = clientAipDb.get_database("AIP_DB")
+    aip_collection = aip_db.get_collection(aip_coll_name)
+    docs = loads(dumps(aip_collection.find({ "user": user_id })))
+    if (docs):
+        return Response(list(str(docs)), status=status.HTTP_200_OK)
+    else:
+        return HttpResponse(status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+@api_view(['POST'])
+@csrf_exempt
+def query(request):
+    print('querying Chatbot...')
+    user_id = request.data.get('user_id')
+    rag_model_name = request.data.get('rag_model')
+    question = request.data.get('query')
+
+    rag_chain = load_chain(chains[user_id+rag_model_name])
+
+    answer = rag_chain.invoke(question)
+
+    print("Question: " + question)
+    print("Answer: " + answer)
+  
+    if (answer):
+        return Response(answer, status=status.HTTP_200_OK)
+    else:
+        HttpResponse(status.HTTP_405_METHOD_NOT_ALLOWED)

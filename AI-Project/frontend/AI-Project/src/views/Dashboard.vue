@@ -2,6 +2,7 @@
 
 import '@/assets/style/styles.scss';
 import '@/assets/css/base.css';
+import '@/assets/css/chat.css'
 import * as Logic from '@/assets/js/triggerLogic';
 import { slideToggle, slideUp, slideDown } from '@/assets/js/libs/slide';
 import { ANIMATION_DURATION } from '@/assets/js/libs/constants';
@@ -18,6 +19,9 @@ import Modal from '@/components/Modal.vue'
 const route = useRoute();
 const user_id = route.params.id;
 const contexts_array = ref([]);
+const models_array = ref([]);
+
+const chat_messages = ref([]);
 
 checkAuth(user_id).then((auth) => {
   if (!auth) start();
@@ -133,7 +137,15 @@ Logic.getContexts(user_id).then((data) => {
   temp.forEach((item) => {
     // edit contexts' names;
   });
-  contexts_array.value = data;
+  contexts_array.value = data; // temp
+});
+
+Logic.getModels(user_id).then((data) => {
+  const temp = [data];
+  temp.forEach((item) => {
+    // edit contexts' names;
+  });
+  models_array.value = data; // temp
 });
 
 const showRAGged = ref(true);
@@ -145,6 +157,9 @@ const showBills = ref(false);
 const showProfile= ref(false);
 const showPaymentMethod = ref(false);
 const showPlan = ref(false);
+
+const chat = ref(false);
+const chat_model = ref();
 
 const urlNotUploaded = ref(true);
 const filesNotUploaded = ref(true);
@@ -180,6 +195,12 @@ function onFileUpload() {
 
 function onUrlUpload() {
   urlNotUploaded.value=false;
+}
+
+function startRagUI(model) {
+  clear();
+  chat.value = true;
+  chat_model.value = model;
 }
 
 </script>
@@ -349,19 +370,39 @@ function onUrlUpload() {
             <Modal button-message="+ Create">
               <h2>Create a new Model</h2>
 	            <p>Choose a large language model to RAG with your context and query</p>
-              <fieldset>
               <h2>Select a context</h2>
+              <fieldset>
               <label v-for="item in contexts_array" class="rad-label">
-                <input type="radio" class="rad-input" name="rad" value="">
+                <input type="radio" class="rad-input" name="context" v-bind:value="item">
                 <div class="rad-design"></div>
                 <div class="rad-text">{{ item }}</div>
               </label>
               </fieldset>
               <h2 class="mt-2">Select a Model</h2>
+              <fieldset>
+              <label class="rad-label">
+                <input type="radio" class="rad-input" name="model" value="openai">
+                <div class="rad-design"></div>
+                <div class="rad-text">OpenAI</div>
+              </label>
+              <label class="rad-label">
+                <input type="radio" class="rad-input" name="model" value="cohere">
+                <div class="rad-design"></div>
+                <div class="rad-text">Cohere</div>
+              </label>
+              <label class="rad-label">
+                <input type="radio" class="rad-input" name="model" value="anthropic">
+                <div class="rad-design"></div>
+                <div class="rad-text">Anthropic</div>
+              </label>
+              </fieldset><br>
+              <MaterialButton id="rag" color="secondary" @click="Logic.addNewModel(user_id)">Create Rag</MaterialButton>
             </Modal>
             
             <div class="grid-container">
-              <div class="grid-item"><ModelCardElement model-name="AAA"></ModelCardElement></div>
+              <div v-for="item in models_array"
+                @click="startRagUI(item)" class="grid-item"><ModelCardElement v-bind:model-name="item">{{ item }}</ModelCardElement>
+              </div>
             </div>
             </div>
           
@@ -386,10 +427,38 @@ function onUrlUpload() {
             </Modal>
 
             <div class="grid-container">
-              <div class="grid-item"><ContextCardElement context-name="BBB"></ContextCardElement></div>
+              <div v-for="item in contexts_array"
+              class="grid-item"><ContextCardElement v-bind:context-name="item">{{ item }}</ContextCardElement>
             </div>
             </div>
-            
+            </div>
+
+
+            <div v-else-if="chat">
+            <h1 style="margin-bottom: 0"> ... Chat</h1>
+            <span style="display: inline-block; margin-bottom: 10px">
+              Ask questions to your RAGged model to unlock all Cogitch power.
+            </span>
+
+            <div class="wrapper">
+              <ul id="chatList">
+                <li>hello,are we meeting today?</li>
+                <li>yes,what time suits you?</li>
+                <li>i was thinking after lunch,i have a meeting in the morning</li>
+                <li>maybe another day?</li>
+                <li>that's all right</li>
+              </ul>
+            </div>
+
+            <MaterialInput id="queryBot"
+                    class="input-group-outline mb-3"
+                    placeholder="Write message..."
+                    type="text">
+            </MaterialInput>
+            <MaterialButton @click="Logic.queryBot(user_id, chat_model.value)" id="sendbtn" color="secondary"></MaterialButton>
+
+            </div>
+  
           </Transition>
           
           </div>

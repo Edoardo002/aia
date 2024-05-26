@@ -12,7 +12,7 @@ defineProps({
 <template>
 
 <div class="card-container">
-      <a href="/" class="hero-image-container">
+      <a class="hero-image-container">
         <img class="hero-image" src="https://i.gzn.jp/img/2021/01/23/pdf-history/00.png" alt="Spinning glass cube"/>
       </a>
       <main class="main-content">

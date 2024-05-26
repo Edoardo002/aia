@@ -47,7 +47,7 @@ export async function addNewModel(user_id) {
             body: JSON.stringify({ user_id:user_id, context_name:context_name, model:model })
             });
         if (response.ok) {
-            window.dialog.close();
+            window.location.reload();
             const data = await response.json();
             console.log(data);
             return data;
@@ -88,9 +88,8 @@ export async function getModels(user_id) {
         body: JSON.stringify({ user_id:user_id })
         });
     if (response.ok) {
-        const data = await response.json();
+        const data = await response.text();
         console.log(data);
-        alert(data);
         return data;
     } else {
         const error = await response.json();
@@ -99,10 +98,16 @@ export async function getModels(user_id) {
     }
 }
 
-export async function queryBot(user_id, model) {
-    const query = document.getElementById("queryBot").innerText;
-    const rag_model = model;
-    alert(query);
+export async function queryBot(user_id) {
+    var list = document.getElementById("chatList");
+    var el = document.createElement("li");
+    const query = document.getElementById("queryBot").value;
+    el.appendChild(document.createTextNode(query));
+    list.appendChild(el);
+    list.scrollTop = list.scrollHeight;
+    document.getElementById("sendbtn").disabled=true;
+    document.getElementById("queryBot").value="";
+    const rag_model = document.getElementById("chatName").innerHTML;
     const response = await fetch('http://127.0.0.1:8000/chatbot/queryChatbot', {
         method: 'POST',
         headers: {
@@ -111,13 +116,14 @@ export async function queryBot(user_id, model) {
         body: JSON.stringify({ user_id:user_id, rag_model:rag_model, query:query})
         });
     if (response.ok) {
-        const data = await response.body;
+        const data = await response.text();
         console.log(data);
-        alert(data);
-        var list = document.getElementById("chatList");
-        var el = document.createElement("li");
-        el.appendChild(document.createTextNode(data));
-        list.appendChild(el);
+        var result = data.substring(1, data.length-1).replace(/(\r\n|\n|\r)/gm,"<br>");
+        var _el = document.createElement("li");
+        _el.appendChild(document.createTextNode(result));
+        list.appendChild(_el);
+        list.scrollTop = list.scrollHeight;
+        document.getElementById("sendbtn").disabled=false;
         return;
     } else {
         const error = await response.body;

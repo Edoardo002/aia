@@ -12,7 +12,7 @@ defineProps({
 <template>
 
 <div class="card-container">
-      <a href="/" class="hero-image-container">
+      <a class="hero-image-container">
         <img class="hero-image" src="https://appmaster.io/api/_files/oeHrNPjB9CSUTM4HTfypjP/download/" alt="Spinning glass cube"/>
       </a>
       <main class="main-content">

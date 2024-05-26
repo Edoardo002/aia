@@ -133,19 +133,18 @@ ismb.forEach((element) => {
 })
 
 Logic.getContexts(user_id).then((data) => {
-  const temp = [data];
-  temp.forEach((item) => {
-    // edit contexts' names;
-  });
-  contexts_array.value = data; // temp
+  contexts_array.value = data;
 });
 
 Logic.getModels(user_id).then((data) => {
-  const temp = [data];
-  temp.forEach((item) => {
-    // edit contexts' names;
+  var res = data.substring(2, data.length-2);
+  let array = res.split(': ');
+  var temp = []; var i = 0;
+  array.forEach((item) => {
+    if (!i%2==0) temp.push(array[i].substring(1, array[i].length-2));
+    i++;
   });
-  models_array.value = data; // temp
+  models_array.value = temp; // temp
 });
 
 const showRAGged = ref(true);
@@ -435,18 +434,14 @@ function startRagUI(model) {
 
 
             <div v-else-if="chat">
-            <h1 style="margin-bottom: 0"> ... Chat</h1>
+            <h1 id="chatName" style="margin-bottom: 0"> {{ chat_model }} </h1>
             <span style="display: inline-block; margin-bottom: 10px">
               Ask questions to your RAGged model to unlock all Cogitch power.
             </span>
 
             <div class="wrapper">
               <ul id="chatList">
-                <li>hello,are we meeting today?</li>
-                <li>yes,what time suits you?</li>
-                <li>i was thinking after lunch,i have a meeting in the morning</li>
-                <li>maybe another day?</li>
-                <li>that's all right</li>
+                <li>Hi, ask me anything!</li>
               </ul>
             </div>
 
@@ -455,8 +450,7 @@ function startRagUI(model) {
                     placeholder="Write message..."
                     type="text">
             </MaterialInput>
-            <MaterialButton @click="Logic.queryBot(user_id, chat_model.value)" id="sendbtn" color="secondary"></MaterialButton>
-
+            <MaterialButton @click="Logic.queryBot(user_id)" id="sendbtn" color="secondary">SEND</MaterialButton>
             </div>
   
           </Transition>
@@ -495,7 +489,7 @@ p {
 
 input {
   margin-bottom: 1rem;
-  color: #ffffff;
+  color: #fffff4 !important;
 }
 
 input::file-selector-button {

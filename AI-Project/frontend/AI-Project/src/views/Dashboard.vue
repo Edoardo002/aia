@@ -141,7 +141,7 @@ Logic.getModels(user_id).then((data) => {
   let array = res.split(': ');
   var temp = []; var i = 0;
   array.forEach((item) => {
-    if (!i%2==0) temp.push(array[i].substring(1, array[i].length-2));
+    if (!i%2==0) temp.push(array[i].split('.')[0].substring(1));
     i++;
   });
   models_array.value = temp; // temp
@@ -414,13 +414,25 @@ function startRagUI(model) {
             <Modal button-message="+ Add">
               <h2>Upload your context</h2>
 	            <p>Here you can store your documents by selecting files from your device or linking a Sharepoint repository</p>
-              <MaterialInput id="inputContext"
+              <MaterialInput id="contextURL"
                     class="input-group-outline mb-3"
                     placeholder="Sharepoint URL"
                     type="url" v-on:input="onUrlUpload"> </MaterialInput>
-              <MaterialButton id="sharebtn" color="secondary" :disabled="urlNotUploaded"
+              <MaterialInput id="clientId"
+                    class="input-group-outline mb-3"
+                    placeholder="client id"> </MaterialInput>
+              <MaterialInput id="clientSecret"
+                    class="input-group-outline mb-3"
+                    placeholder="client secret"> </MaterialInput>
+              <MaterialInput id="documentLib"
+                    class="input-group-outline mb-3"
+                    placeholder="document library id"> </MaterialInput>
+              <MaterialInput id="path"
+                    class="input-group-outline mb-3"
+                    placeholder="folder path"> </MaterialInput>
+              <MaterialButton id="sharebtn" color="secondary" :disabled="urlNotUploaded" @click="Logic.addSharepointContext(user_id)"
                 >use sharepoint</MaterialButton>
-              <input id="userFiles" type="file" accept=".doc, .docx, .txt, .pdf" v-on:change="onFileUpload" multiple>
+              <input id="userFiles" type="file" accept=".txt, .pdf" v-on:change="onFileUpload" multiple="true">
               <MaterialButton id="uploadbtn" color="secondary" :disabled="filesNotUploaded" @click="Logic.addNewContext(user_id)"
                 >upload</MaterialButton>
             </Modal>

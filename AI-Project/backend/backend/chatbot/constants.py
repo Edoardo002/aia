@@ -1,3 +1,6 @@
 APIKEY = "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"
 ATLASSRV = "mongodb+srv://Cluster43266:ogtdNMdR7GWEzN0C@clustervs.tc0gz.mongodb.net"
 AIPDB="mongodb+srv://oren002:n1Z4SkCUzPYfIWro@aip.mr6qcfe.mongodb.net/?retryWrites=true&w=majority&appName=AIP"
+ATLAS_PK="znmreqyt"
+ATLAS_K="68f90138-677b-497a-91b1-20cbc2bcb663"
+IDX_URL="https://cloud.mongodb.com/api/atlas/v2/groups/652feb621a39934b0c83b45b/clusters/ClusterVS/search/indexes"

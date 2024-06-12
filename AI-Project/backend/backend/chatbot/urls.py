@@ -9,6 +9,7 @@ urlpatterns = [
     path('signup', views.signup_view),
     path('check', views.checkAuthentication),
     path('loadContext', rag_views.loadContext),
+    path('loadSharepoint', rag_views.loadSharepoint),
     path('addModel', rag_views.addModel),
     path('getContexts', rag_views.getContexts),
     path('getModels', rag_views.getModels),

@@ -1,4 +1,6 @@
 import os
+import re
+import requests
 from pathlib import Path
 from . import constants
 from django.http import HttpResponse
@@ -6,8 +8,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
+from requests.auth import HTTPDigestAuth
 from langchain_community.document_loaders import DirectoryLoader
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import SharePointLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_mongodb import MongoDBAtlasVectorSearch
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -21,16 +24,20 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
 from bson.json_util import dumps
 from bson.json_util import loads
+from office365.sharepoint.client_context import AuthenticationContext
 
 # Statefully manage chat history
 store = {}
 # Constant variables
 AIP_DB = constants.AIPDB
 ATLAS_CONNECTION_STRING = constants.ATLASSRV
+ATLAS_PUB_KEY = constants.ATLAS_PK
+ATLAS_K = constants.ATLAS_K
+IDX_URL = constants.IDX_URL
 clientAtlas = MongoClient(ATLAS_CONNECTION_STRING)
 clientAipDb = MongoClient(host=AIP_DB, port=27017)
 
-os.environ["OPENAI_API_KEY"] = constants.APIKEY # TODO - encrypt
+os.environ["OPENAI_API_KEY"] = constants.APIKEY
 
 q_prompt = ChatPromptTemplate.from_messages(
     [
@@ -49,6 +56,81 @@ qa_prompt = ChatPromptTemplate.from_messages(
 
 @api_view(['POST'])
 @csrf_exempt
+def loadSharepoint(request):
+    print('loading Context from Sharepoint...')
+    user_id = request.data.get('user_id')
+    sp_link = request.data.get('sp_link')
+    split = re.split("sharepoint.com", sp_link)
+
+    client_id = request.data.get('client_id')
+    client_secret = request.data.get('client_secret')
+    document_library_id = request.data.get('document_library_id')
+    path = request.data.get('folder_path')
+    
+    os.environ['O365_CLIENT_ID'] = client_id
+    os.environ['O365_CLIENT_SECRET'] = client_secret
+
+    context_auth = AuthenticationContext(url=sp_link)
+
+    token = context_auth.acquire_token_for_app(client_id=client_id, client_secret=client_secret)
+    print(token)
+    saveAuthtoken(token)
+
+    loader = SharePointLoader(document_library_id=document_library_id, folder_path='/'+path, auth_with_token=True)
+    data = loader.load()
+
+    os.environ['O365_CLIENT_ID'] = ''
+    os.environ['O365_CLIENT_SECRET'] = ''
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
+    docs = text_splitter.split_documents(data)
+    print(docs[0])
+
+    db_name = "langchain_db"
+    context_name = re.split("sites/", split[1])[1]
+    collection_name = user_id+"_"+context_name
+    atlas_collection = clientAtlas[db_name][collection_name]
+    
+    index_def = {
+        "collectionName": collection_name,
+        "database": db_name,
+        "name": context_name.split('.')[0],
+        "type": "vectorSearch",
+        "definition": {
+            "fields":[
+                {
+                    "type": "vector",
+                    "path": "embedding",
+                    "numDimensions": 1536,
+                    "similarity": "cosine"
+                }
+            ]
+        }
+    }
+
+    res = requests.post(url=IDX_URL, auth=HTTPDigestAuth(ATLAS_PUB_KEY, ATLAS_K), 
+                        headers={"Content-Type": "application/json", "Accept": "application/vnd.atlas.2024-05-30+json"},
+                        data=dumps(index_def))
+    if (not res.ok):
+       return HttpResponse(status.HTTP_405_METHOD_NOT_ALLOWED) 
+
+    MongoDBAtlasVectorSearch.from_documents(
+        documents = docs,
+        embedding = OpenAIEmbeddings(disallowed_special=()),
+        collection = atlas_collection,
+        index_name = context_name.split('.')[0]
+    )
+
+    return HttpResponse(status.HTTP_200_OK)
+
+def saveAuthtoken(token):
+    output_file = Path("~/.credentials/o365_token.txt")
+    output_file.parent.mkdir(exist_ok=True, parents=True)
+    output_file.write_text(token)
+    return 
+
+@api_view(['POST'])
+@csrf_exempt
 def loadContext(request):
     print('loading Context...')
     user_id = request.data.get('user_id')
@@ -60,22 +142,46 @@ def loadContext(request):
     db_name = "langchain_db"
     collection_name = user_id+"_"+context_name
     atlas_collection = clientAtlas[db_name][collection_name]
-    vector_search_index = "vector_index"
 
     loader = DirectoryLoader("data/"+user_id, glob="*.*", show_progress=True)
     data = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
     docs = text_splitter.split_documents(data)
-
     print(docs[0])
+
+    index_def = {
+        "collectionName": collection_name,
+        "database": db_name,
+        "name": context_name.split('.')[0],
+        "type": "vectorSearch",
+        "definition": {
+            "fields":[
+                {
+                    "type": "vector",
+                    "path": "embedding",
+                    "numDimensions": 1536,
+                    "similarity": "cosine"
+                },
+                {
+                    "type": "filter",
+                    "path": "page"
+                }
+            ]
+        }
+    }
+
+    res = requests.post(url=IDX_URL, auth=HTTPDigestAuth(ATLAS_PUB_KEY, ATLAS_K), 
+                        headers={"Content-Type": "application/json", "Accept": "application/vnd.atlas.2024-05-30+json"},
+                        data=dumps(index_def))
+    print(res.text)
 
     MongoDBAtlasVectorSearch.from_documents(
         documents = docs,
         embedding = OpenAIEmbeddings(disallowed_special=()),
         collection = atlas_collection,
-        index_name = vector_search_index
+        index_name = context_name.split('.')[0]
     )
-    
+
     delete_context_file(user_id)
       
     return HttpResponse(status.HTTP_200_OK)
@@ -165,7 +271,7 @@ def query(request):
         vectorstore = MongoDBAtlasVectorSearch(
             embedding = OpenAIEmbeddings(disallowed_special=()),
             collection = atlas_collection,
-            index_name = "vector_index"
+            index_name = context_name.split('.')[0]
         )   
     
         retriever = vectorstore.as_retriever(
@@ -183,7 +289,7 @@ def query(request):
             get_session_history,
             input_messages_key="input",
             history_messages_key="chat_history",
-            output_messages_key="answer",
+            output_messages_key="answer"
         )
 
         ans = conversational_rag_chain.invoke({'input': question}, {'configurable': {'session_id': user_id}})

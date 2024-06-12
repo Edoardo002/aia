@@ -9,14 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.9.2",
+    "css-pro-layout": "^1.1.0",
     "pinia": "^2.1.7",
     "vue": "^3.4.15",
-    "vue-router": "^4.2.5",
-    "@popperjs/core": "^2.9.2",
-    "css-pro-layout": "^1.1.0"
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.3",
+    "pdfjs-dist": "^4.3.136",
     "sass": "^1.71.1",
     "vite": "^5.0.11"
   }

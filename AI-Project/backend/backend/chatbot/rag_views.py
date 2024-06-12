@@ -66,6 +66,9 @@ def loadSharepoint(request):
     client_secret = request.data.get('client_secret')
     document_library_id = request.data.get('document_library_id')
     path = request.data.get('folder_path')
+
+    if (sp_link=='' or client_id=='' or client_secret=='' or document_library_id=='' or path==''):
+       return HttpResponse(status.HTTP_400_BAD_REQUEST) 
     
     os.environ['O365_CLIENT_ID'] = client_id
     os.environ['O365_CLIENT_SECRET'] = client_secret

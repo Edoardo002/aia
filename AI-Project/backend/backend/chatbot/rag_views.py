@@ -259,7 +259,8 @@ def query(request):
     question = request.data.get('query')
     rag_conf = str(rag_model).split('-')
     model = rag_conf[0]
-    context_name = rag_conf[1]
+    context_name = rag_conf[1].split(user_id+'_')[1]
+    print(context_name)
 
     if (model=="openai"):
 
@@ -274,7 +275,7 @@ def query(request):
         vectorstore = MongoDBAtlasVectorSearch(
             embedding = OpenAIEmbeddings(disallowed_special=()),
             collection = atlas_collection,
-            index_name = context_name.split('.')[0]
+            index_name = context_name
         )   
     
         retriever = vectorstore.as_retriever(
@@ -295,7 +296,7 @@ def query(request):
             output_messages_key="answer"
         )
 
-        ans = conversational_rag_chain.invoke({'input': question}, {'configurable': {'session_id': user_id}})
+        ans = conversational_rag_chain.invoke({'input': question}, {'configurable': {'session_id': user_id, 'llm': llm}})
         
         if (ans):
             return Response(ans["answer"], status=status.HTTP_200_OK)

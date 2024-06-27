@@ -1,4 +1,5 @@
 import * as pdfjs from 'pdfjs-dist';
+import * as pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs';
 pdfjs.GlobalWorkerOptions.workerSrc = import.meta.url + 'pdfjs-dist/build/pdf.worker.mjs';
 
 export function addNewContext(user_id) {
@@ -12,7 +13,7 @@ export function addNewContext(user_id) {
     }
 
     let readers= [];
-
+    
     if (files[0].type == "application/pdf") {
         var pdff = new Pdf2TextClass();
         for(let i = 0;i < files.length;i++) {
@@ -284,7 +285,7 @@ export async function queryBot(user_id) {
     if (response.ok) {
         const data = await response.text();
         console.log(data);
-        var result = data.substring(1, data.length-1).replace(/(\r\n|\n|\r)/gm,"<br>");
+        var result = data.substring(1, data.length-1).replace(/(\r\n|\n|\r|\\)/gm,"<br>");
         var _el = document.createElement("li");
         _el.appendChild(document.createTextNode(result));
         list.appendChild(_el);

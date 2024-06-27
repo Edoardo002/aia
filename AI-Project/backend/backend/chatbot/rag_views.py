@@ -97,7 +97,7 @@ def loadSharepoint(request):
     index_def = {
         "collectionName": collection_name,
         "database": db_name,
-        "name": context_name.split('.')[0],
+        "name": context_name.split('.')[0].replace(' ',''),
         "type": "vectorSearch",
         "definition": {
             "fields":[
@@ -151,11 +151,11 @@ def loadContext(request):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
     docs = text_splitter.split_documents(data)
     print(docs[0])
-
+    
     index_def = {
         "collectionName": collection_name,
         "database": db_name,
-        "name": context_name.split('.')[0],
+        "name": context_name.split('.')[0].replace(' ',''),
         "type": "vectorSearch",
         "definition": {
             "fields":[

@@ -2,11 +2,40 @@ k<script setup>
 import MaterialInput from "@/components/MaterialInput.vue";
 import MaterialSwitch from "@/components/MaterialSwitch.vue";
 import MaterialButton from "@/components/MaterialButton.vue";
-import { dashboard, sign } from '@/assets/js/foundamentals';
+import { dashboard, sign, eLoginSubmit } from '@/assets/js/foundamentals';
+import { signOut } from '@/assets/js/Gauth';
+import * as mAuth from '@/assets/js/Mauth';
+import { onMounted } from "vue";
+
+window.handleCredentialResponse = (response) => {
+    const responsePayload = parseJwt(response.credential);
+    console.log("ID: " + responsePayload.sub);
+    console.log('Full Name: ' + responsePayload.name);
+    console.log('Given Name: ' + responsePayload.given_name);
+    console.log('Family Name: ' + responsePayload.family_name);
+    console.log("Image URL: " + responsePayload.picture);
+    console.log("Email: " + responsePayload.email);
+
+    eLoginSubmit(responsePayload.given_name, responsePayload.family_name, responsePayload.email);
+}
+
+function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
 
 async function loginSubmit() {
   var email = document.getElementById("email").value;
   var password = document.getElementById("password").value;
+  if (email==null || password==null) {
+    alert('Field email or password cannot be empty');
+    return;
+  }
   const response = await fetch('http://127.0.0.1:8000/chatbot/login', {
     method: 'POST',
     headers: {
@@ -24,6 +53,13 @@ async function loginSubmit() {
     alert('Invalid e-mail or password');
   }
 }
+
+onMounted(() => {
+  let gClientScript = document.createElement('script');
+  gClientScript.setAttribute('src', "https://accounts.google.com/gsi/client");
+  document.head.appendChild(gClientScript);
+})
+
 </script>
 <template>
     <div
@@ -101,6 +137,30 @@ async function loginSubmit() {
                       >Sign up</a
                     >
                   </p>
+                </div>
+                <div id="g_id_onload"
+                  data-client_id="616333172733-j0pkj677420lqm9dvljud9d8n2tsok2f.apps.googleusercontent.com"
+                  data-context="signin"
+                  data-ux_mode="popup"
+                  data-callback="handleCredentialResponse"
+                  data-auto_select="false">
+                </div>
+
+                <div class="g_id_signin"
+                  data-type="standard"
+                  data-shape="pill"
+                  data-theme="filled_black"
+                  data-text="signin_with"
+                  data-size="large"
+                  data-logo_alignment="left">
+                </div>
+                <div class="text-center">
+                    <MaterialButton
+                      class="my-4 mb-2"
+                      color="info" @click="mAuth.signIn"
+                      fullWidth
+                      >Accedi con Microsoft</MaterialButton
+                    >
                 </div>
               </div>
             </div>

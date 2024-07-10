@@ -9,6 +9,10 @@ async function signupSubmit() {
   var password = document.getElementById("password").value;
   var first_name = document.getElementById("first_name").value;
   var last_name = document.getElementById("last_name").value;
+  if (email==null || password==null || first_name==null || last_name==null) {
+    alert('All fields are mandatory');
+    return;
+  }
   const response = await fetch('http://127.0.0.1:8000/chatbot/signup', {
     method: 'POST',
     headers: {

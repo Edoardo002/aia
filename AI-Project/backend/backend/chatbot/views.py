@@ -10,6 +10,12 @@ from .models import UserManager
 from .serializers import UserSerializer
 from datetime import datetime
 from datetime import timedelta
+from . import constants
+from bson.json_util import dumps
+from pymongo import MongoClient
+
+AIP_DB = constants.AIPDB
+clientAipDb = MongoClient(host=AIP_DB, port=27017)
 
 @api_view(['POST'])
 @csrf_exempt
@@ -19,6 +25,8 @@ def checkAuthentication(request):
     user_obj = User.objects.get(id=user_id)
     today = datetime.today()
     limit = today - timedelta(hours=4)
+    if user_obj.last_login is None:
+        return Response({'okay'}, status=status.HTTP_200_OK)
     if user_obj.last_login.timestamp() > limit.timestamp():
         return Response({'success': 'okay'}, status=status.HTTP_200_OK)
     else:
@@ -37,6 +45,27 @@ def login_view(request):
         return Response(serializer.data)
     else:
         return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['POST'])
+@csrf_exempt
+def login_ext_view(request):
+    print('External log in...')
+    email = request.data.get('email')
+    aip_db = clientAipDb.get_database("AIP_DB")
+    aip_collection = aip_db.get_collection("chatbot_user")
+    serializer = UserSerializer(data=request.data)
+    if aip_collection.count_documents({ "email": email }) == 0:
+        if serializer.is_valid():
+            #serializers.save()
+            UserManager.create_user(self=User.objects, email=serializer.validated_data['email'], password="ext",
+                                    first_name=serializer.validated_data['first_name'], last_name=serializer.validated_data['last_name'])
+            user = aip_collection.find_one({ "email" : email })
+            return Response(dumps(user), status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        res = aip_collection.find_one({ "email" : email })
+        return Response(dumps(res), status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @csrf_exempt

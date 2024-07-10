@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from djongo import models
+from datetime import datetime
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
@@ -7,7 +8,10 @@ class UserManager(BaseUserManager):
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
-        user.set_password(password)
+        if (password=="ext"):
+            user.set_password("")
+        else:
+            user.set_password(password)
         user.save(using=self._db)
         return user
 

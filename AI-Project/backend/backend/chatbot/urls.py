@@ -5,6 +5,7 @@ from . import rag_views
 
 urlpatterns = [
     path('login', views.login_view),
+    path('extlogin', views.login_ext_view),
     path('logout', views.logout_view),
     path('signup', views.signup_view),
     path('check', views.checkAuthentication),

@@ -1,4 +1,7 @@
 import router from "@/router";
+import Sqids from "sqids";
+
+const sqids = new Sqids({minLength: 10,});
 
 export function start() {
   router.push({ path: '/login' })  }
@@ -6,8 +9,19 @@ export function start() {
 export function sign() {
   router.push({ path: '/signup' })  }
 
+export function getId(squid) {
+  const arr = sqids.decode(squid);
+  var str = "";
+  arr.forEach((elem) => {
+    str+=elem;
+  })
+  return str;
+}  
+
 export function dashboard(user) {
-  router.push({ path: `/dashboard/${user.id}`});
+  const arr = Array.from(String(user.id));
+  const id = sqids.encode(arr);
+  router.push({ path: `/dashboard/${id}`});
 }
 
 export async function checkAuth(user_id) {

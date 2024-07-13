@@ -3,6 +3,7 @@ import * as pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs';
 pdfjs.GlobalWorkerOptions.workerSrc = import.meta.url + 'pdfjs-dist/build/pdf.worker.mjs';
 
 export function addNewContext(user_id) {
+    const embeddings = document.querySelector('input[name="embed"]:checked').value;
     var files = document.getElementById("userFiles").files;
     var name = document.getElementById("userFiles").value;
     name = name.replace(/.*[\/\\]/, '');
@@ -33,7 +34,7 @@ export function addNewContext(user_id) {
                             headers: {
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({ user_id:user_id, context_name:name, context:content })
+                            body: JSON.stringify({ user_id:user_id, context_name:name, context:content, embeddings:embeddings })
                         });
                         if (response.ok) {
                             window.dialog.close();
@@ -67,7 +68,7 @@ export function addNewContext(user_id) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user_id:user_id, context_name:name, context:content })
+                body: JSON.stringify({ user_id:user_id, context_name:name, context:content, embeddings:embeddings })
             });
             if (response.ok) {
                 window.dialog.close();
@@ -174,6 +175,7 @@ function Pdf2TextClass() {
 
 export async function addSharepointContext(user_id) {
 
+    const embeddings = document.querySelector('input[name="embed"]:checked').value;
     const sp_link = document.getElementById('contextURL').value;
     const client_id = document.getElementById('clientId').value;
     const client_secret = document.getElementById('clientSecret').value;
@@ -184,7 +186,7 @@ export async function addSharepointContext(user_id) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ user_id:user_id, client_id:client_id, client_secret:client_secret, sp_link:sp_link, document_library_id:document_library_id, folder_path:folder_path })
+            body: JSON.stringify({ user_id:user_id, client_id:client_id, client_secret:client_secret, sp_link:sp_link, document_library_id:document_library_id, folder_path:folder_path, embeddings:embeddings })
             });
         if (response.ok) {
             window.dialog.close();

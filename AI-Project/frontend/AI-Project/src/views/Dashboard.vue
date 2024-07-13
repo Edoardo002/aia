@@ -8,7 +8,7 @@ import { slideToggle, slideUp, slideDown } from '@/assets/js/libs/slide';
 import { ANIMATION_DURATION } from '@/assets/js/libs/constants';
 import Poppers from '@/assets/js/libs/poppers';
 import { onMounted, ref } from 'vue';
-import { start, checkAuth} from '@/assets/js/foundamentals';
+import { start, checkAuth, getId} from '@/assets/js/foundamentals';
 import { useRoute } from 'vue-router';
 import ModelCardElement from '@/components/ModelCardElement.vue'
 import ContextCardElement from '@/components/ContextCardElement.vue'
@@ -17,7 +17,8 @@ import MaterialInput from '@/components/MaterialInput.vue';
 import Modal from '@/components/Modal.vue'
 
 const route = useRoute();
-const user_id = route.params.id;
+const user_sqid = route.params.id;
+const user_id = getId(user_sqid);
 const contexts_array = ref([]);
 const models_array = ref([]);
 
@@ -430,6 +431,19 @@ function startRagUI(model) {
               <MaterialInput id="path"
                     class="input-group-outline mb-3"
                     placeholder="folder path"> </MaterialInput>
+              <h2 class="mt-2">Select an Embedding</h2>
+              <fieldset>
+              <label class="rad-label">
+                <input type="radio" class="rad-input" name="embed" value="openai">
+                <div class="rad-design"></div>
+                <div class="rad-text">OpenAI</div>
+              </label>
+              <label class="rad-label">
+                <input type="radio" class="rad-input" name="embed" value="cohere">
+                <div class="rad-design"></div>
+                <div class="rad-text">Cohere</div>
+              </label>
+              </fieldset><br>
               <MaterialButton id="sharebtn" color="secondary" :disabled="urlNotUploaded" @click="Logic.addSharepointContext(user_id)"
                 >use sharepoint</MaterialButton>
               <input id="userFiles" type="file" accept=".txt, .pdf" v-on:change="onFileUpload" multiple="true">

@@ -14,6 +14,8 @@ from langchain_community.document_loaders import SharePointLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_mongodb import MongoDBAtlasVectorSearch
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_cohere import ChatCohere, CohereEmbeddings
+from langchain_anthropic import ChatAnthropic
 from pymongo import MongoClient
 from langchain.chains.history_aware_retriever import create_history_aware_retriever
 from langchain.chains.retrieval import create_retrieval_chain
@@ -38,6 +40,8 @@ clientAtlas = MongoClient(ATLAS_CONNECTION_STRING)
 clientAipDb = MongoClient(host=AIP_DB, port=27017)
 
 os.environ["OPENAI_API_KEY"] = constants.APIKEY
+os.environ["COHERE_API_KEY"] = constants.COHERE_KEY
+os.environ["ANTHROPIC_API_KEY"] = constants.ANTHROPIC_KEY
 
 q_prompt = ChatPromptTemplate.from_messages(
     [
@@ -61,6 +65,7 @@ def loadSharepoint(request):
     user_id = request.data.get('user_id')
     sp_link = request.data.get('sp_link')
     split = re.split("sharepoint.com", sp_link)
+    embed = request.data.get('embeddings')
 
     client_id = request.data.get('client_id')
     client_secret = request.data.get('client_secret')
@@ -115,11 +120,16 @@ def loadSharepoint(request):
                         headers={"Content-Type": "application/json", "Accept": "application/vnd.atlas.2024-05-30+json"},
                         data=dumps(index_def))
     if (not res.ok):
-       return HttpResponse(status.HTTP_405_METHOD_NOT_ALLOWED) 
+       return HttpResponse(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    if (embed=="openai"):
+        embeddings = OpenAIEmbeddings(disallowed_special=())
+    elif (embed=="cohere"):
+        embeddings = CohereEmbeddings(model="embed-multilingual-light-v3.0")
 
     MongoDBAtlasVectorSearch.from_documents(
         documents = docs,
-        embedding = OpenAIEmbeddings(disallowed_special=()),
+        embedding = embeddings,
         collection = atlas_collection,
         index_name = context_name.split('.')[0]
     )
@@ -139,6 +149,7 @@ def loadContext(request):
     user_id = request.data.get('user_id')
     context_name = request.data.get('context_name')
     context = request.data.get('context')
+    embed = request.data.get('embeddings')
 
     to_file(context, user_id)
 
@@ -176,11 +187,17 @@ def loadContext(request):
     res = requests.post(url=IDX_URL, auth=HTTPDigestAuth(ATLAS_PUB_KEY, ATLAS_K), 
                         headers={"Content-Type": "application/json", "Accept": "application/vnd.atlas.2024-05-30+json"},
                         data=dumps(index_def))
-    print(res.text)
+    if (not res.ok):
+       return HttpResponse(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    if (embed=="openai"):
+        embeddings = OpenAIEmbeddings(disallowed_special=())
+    elif (embed=="cohere"):
+        embeddings = CohereEmbeddings(model="embed-multilingual-light-v3.0")
 
     MongoDBAtlasVectorSearch.from_documents(
         documents = docs,
-        embedding = OpenAIEmbeddings(disallowed_special=()),
+        embedding = embeddings,
         collection = atlas_collection,
         index_name = context_name.split('.')[0]
     )
@@ -274,6 +291,88 @@ def query(request):
 
         vectorstore = MongoDBAtlasVectorSearch(
             embedding = OpenAIEmbeddings(disallowed_special=()),
+            collection = atlas_collection,
+            index_name = context_name
+        )   
+    
+        retriever = vectorstore.as_retriever(
+        search_type = "similarity",
+        search_kwargs = {"k": 10, "score_threshold": 0.75})
+
+        history_aware_retriever = create_history_aware_retriever(
+            llm, retriever, q_prompt
+        )
+        question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
+        rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
+        
+        conversational_rag_chain = RunnableWithMessageHistory(
+            rag_chain,
+            get_session_history,
+            input_messages_key="input",
+            history_messages_key="chat_history",
+            output_messages_key="answer"
+        )
+
+        ans = conversational_rag_chain.invoke({'input': question}, {'configurable': {'session_id': user_id, 'llm': llm}})
+        
+        if (ans):
+            return Response(ans["answer"], status=status.HTTP_200_OK)
+        else:
+            HttpResponse(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    elif (model=="cohere"):
+
+        llm = ChatCohere()
+
+        db_name = "langchain_db"
+        db = clientAtlas.get_database(db_name)
+        filter = {"name": {"$regex": context_name}}
+        coll = db.list_collection_names(filter=filter)[0]
+        atlas_collection = clientAtlas[db_name][coll]
+
+        vectorstore = MongoDBAtlasVectorSearch(
+            embedding = CohereEmbeddings(model="embed-multilingual-light-v3.0"),
+            collection = atlas_collection,
+            index_name = context_name
+        )   
+    
+        retriever = vectorstore.as_retriever(
+        search_type = "similarity",
+        search_kwargs = {"k": 10, "score_threshold": 0.75})
+
+        history_aware_retriever = create_history_aware_retriever(
+            llm, retriever, q_prompt
+        )
+        question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
+        rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
+        
+        conversational_rag_chain = RunnableWithMessageHistory(
+            rag_chain,
+            get_session_history,
+            input_messages_key="input",
+            history_messages_key="chat_history",
+            output_messages_key="answer"
+        )
+
+        ans = conversational_rag_chain.invoke({'input': question}, {'configurable': {'session_id': user_id, 'llm': llm}})
+        
+        if (ans):
+            return Response(ans["answer"], status=status.HTTP_200_OK)
+        else:
+            HttpResponse(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    elif (model=="anthropic"):
+
+        llm = ChatAnthropic(model='claude-3-opus-20240229')
+
+        db_name = "langchain_db"
+        db = clientAtlas.get_database(db_name)
+        filter = {"name": {"$regex": context_name}}
+        coll = db.list_collection_names(filter=filter)[0]
+        atlas_collection = clientAtlas[db_name][coll]
+
+        vectorstore = MongoDBAtlasVectorSearch(
+            embedding = CohereEmbeddings(model="embed-multilingual-light-v3.0"),
             collection = atlas_collection,
             index_name = context_name
         )   

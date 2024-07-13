@@ -22,9 +22,22 @@ clientAipDb = MongoClient(host=AIP_DB, port=27017)
 def checkAuthentication(request):
     print('Checking...')
     user_id = request.data.get('user_id')
-    user_obj = User.objects.get(id=user_id)
+    token = request.data.get('token')
     today = datetime.today()
     limit = today - timedelta(hours=4)
+    if User.objects.filter(id=user_id).first()==None:
+        return Response({'page not reachable'}, status=status.HTTP_401_UNAUTHORIZED)
+    user_obj = User.objects.get(id=user_id)
+    if user_obj.get_session_auth_hash() != token:
+        if User.objects.filter(id=user_id, token=token).exists()==True:
+            if user_obj.last_login is None:
+                return Response({'okay'}, status=status.HTTP_200_OK)
+            if user_obj.last_login.timestamp() > limit.timestamp():
+                return Response({'success': 'okay'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'session expired'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({'page not reachable'}, status=status.HTTP_401_UNAUTHORIZED)
     if user_obj.last_login is None:
         return Response({'okay'}, status=status.HTTP_200_OK)
     if user_obj.last_login.timestamp() > limit.timestamp():
@@ -42,7 +55,7 @@ def login_view(request):
     if user is not None:
         login(request, user)
         serializer = UserSerializer(user)
-        return Response(serializer.data)
+        return Response({ 'token' : user.get_session_auth_hash(), 'user' : serializer.data })
     else:
         return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
     

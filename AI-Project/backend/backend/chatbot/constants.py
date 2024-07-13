@@ -4,3 +4,5 @@ AIPDB="mongodb+srv://oren002:n1Z4SkCUzPYfIWro@aip.mr6qcfe.mongodb.net/?retryWrit
 ATLAS_PK="zefkqcxc"
 ATLAS_K="012edcd8-b635-4622-a80f-739ddd22ccb4"
 IDX_URL="https://cloud.mongodb.com/api/atlas/v2/groups/652feb621a39934b0c83b45b/clusters/ClusterVS/search/indexes"
+COHERE_KEY="w7SNGDLRUXFDFXdsIUt4yx0chRRvwNtOJezsw4Qm"
+ANTHROPIC_KEY="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"

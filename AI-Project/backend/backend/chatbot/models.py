@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from djongo import models
-from datetime import datetime
+import secrets
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
@@ -10,6 +10,7 @@ class UserManager(BaseUserManager):
         user = self.model(email=email, **extra_fields)
         if (password=="ext"):
             user.set_password("")
+            user.set_token(secrets.token_urlsafe(64))
         else:
             user.set_password(password)
         user.save(using=self._db)
@@ -25,6 +26,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
+    token = models.CharField(max_length=64)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -33,6 +35,10 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     objects = UserManager()
+
+    def set_token(self, tok):
+        self.token = tok
+        return
 
     def __str__(self):
         return self.email

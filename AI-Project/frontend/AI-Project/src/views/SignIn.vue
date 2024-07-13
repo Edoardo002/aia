@@ -45,8 +45,13 @@ async function loginSubmit() {
   });
   if (response.ok) {
     const data = await response.json();
-    console.log(data);
-    dashboard(data);
+    const now = new Date()
+    const token = {
+        value: data.token,
+        expiry: now.getTime() + 3600*1000*4,
+    }
+    localStorage.setItem('token', JSON.stringify(token));
+    dashboard(data.user);
   } else {
     const error = await response.json();
     console.error(error);

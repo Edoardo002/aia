@@ -13,6 +13,7 @@ from datetime import timedelta
 from . import constants
 from bson.json_util import dumps
 from pymongo import MongoClient
+import secrets
 
 AIP_DB = constants.AIPDB
 clientAipDb = MongoClient(host=AIP_DB, port=27017)
@@ -30,8 +31,6 @@ def checkAuthentication(request):
     user_obj = User.objects.get(id=user_id)
     if user_obj.get_session_auth_hash() != token:
         if User.objects.filter(id=user_id, token=token).exists()==True:
-            if user_obj.last_login is None:
-                return Response({'okay'}, status=status.HTTP_200_OK)
             if user_obj.last_login.timestamp() > limit.timestamp():
                 return Response({'success': 'okay'}, status=status.HTTP_200_OK)
             else:
@@ -70,7 +69,7 @@ def login_ext_view(request):
     if aip_collection.count_documents({ "email": email }) == 0:
         if serializer.is_valid():
             #serializers.save()
-            UserManager.create_user(self=User.objects, email=serializer.validated_data['email'], password="ext",
+            UserManager.create_user(self=User.objects, email=serializer.validated_data['email'], password="ext", last_login=datetime.today(),
                                     first_name=serializer.validated_data['first_name'], last_name=serializer.validated_data['last_name'])
             user = aip_collection.find_one({ "email" : email })
             return Response(dumps(user), status=status.HTTP_201_CREATED)
@@ -78,6 +77,11 @@ def login_ext_view(request):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         res = aip_collection.find_one({ "email" : email })
+        today = datetime.today()
+        limit = today - timedelta(hours=4)
+        if res["last_login"].timestamp() < limit.timestamp():
+            aip_collection.update_one({ "email" : email }, { "$set": { "last_login": datetime.today(), "token": secrets.token_urlsafe(64) } })
+            res = aip_collection.find_one({ "email" : email })
         return Response(dumps(res), status=status.HTTP_200_OK)
 
 @api_view(['POST'])

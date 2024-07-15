@@ -9,7 +9,7 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         if (password=="ext"):
-            user.set_password("")
+            user.set_password(secrets.token_hex(128))
             user.set_token(secrets.token_urlsafe(64))
         else:
             user.set_password(password)

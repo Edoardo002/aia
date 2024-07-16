@@ -2,7 +2,8 @@
 
 import '@/assets/style/styles.scss';
 import '@/assets/css/base.css';
-import '@/assets/css/chat.css'
+import '@/assets/css/chat.css';
+import '@/assets/css/pricing.css';
 import * as Logic from '@/assets/js/triggerLogic';
 import { slideToggle, slideUp, slideDown } from '@/assets/js/libs/slide';
 import { ANIMATION_DURATION } from '@/assets/js/libs/constants';
@@ -478,7 +479,53 @@ function startRagUI(model) {
             </MaterialInput>
             <MaterialButton @click="Logic.queryBot(user_id)" id="sendbtn" color="secondary">SEND</MaterialButton>
             </div>
-  
+
+            <div v-else-if="showPlan">
+              <h1 style="margin-bottom: 0">Plan</h1>
+              <span style="display: inline-block;">
+                Select your subscription plan to CogiTCH
+              </span>
+
+              <div class="grid_price">
+                  <div class="card_price">
+                      <h2 class="card_price_title">Student</h2>
+                      <p class="pricing">20$<span class="small">/per month</span></p>
+                      <span class="small">Save 6$</span>
+                      <hr>
+                      <ul class="features">
+                          <li>Personal Account</li>
+                          <li>Limited Contexts</li>
+                          <li>Limited Queries</li>
+                      </ul>
+                      <a href="#" class="cta_btn">Buy Now</a>
+                  </div>
+                  <div class="card_price">
+                      <h2 class="card_price_title">Personal</h2>
+                      <p class="pricing">60$<span class="small">/per month</span></p>
+                      <span class="small">Save 15$</span>
+                      <hr>
+                      <ul class="features">
+                          <li>Personal account</li>
+                          <li>Limited Contexts</li>
+                          <li>Unlimited Queries</li>
+                      </ul>
+                       <a href="#" class="cta_btn">Buy Now</a>
+                  </div>
+                  <div class="card_price">
+                      <h2 class="card_price_title">Business</h2>
+                      <p class="pricing">100$<span class="small">/per month</span></p>
+                      <span class="small">Save 25$</span>
+                      <hr>
+                      <ul class="features">
+                          <li>Organizational Accounts</li>
+                          <li>Unlimited Contexts</li>
+                          <li>Unlimited Queries</li>
+                      </ul>
+                       <a href="#" class="cta_btn">Buy Now</a>
+                  </div>
+              </div>
+            </div>
+
           </Transition>
           
           </div>

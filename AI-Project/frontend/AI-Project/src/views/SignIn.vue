@@ -117,6 +117,7 @@ onMounted(() => {
                     class="input-group-outline mb-3"
                     placeholder="password"
                     type="password"
+                    maxlength="40"
                   />
                   <MaterialSwitch
                     class="d-flex align-items-center mb-3"

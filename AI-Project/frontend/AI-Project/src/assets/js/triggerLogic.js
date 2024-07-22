@@ -287,7 +287,7 @@ export async function queryBot(user_id) {
     if (response.ok) {
         const data = await response.text();
         console.log(data);
-        var result = data.substring(1, data.length-1).replace(/(\r\n|\n|\r|\\)/gm,"<br>");
+        var result = data.substring(1, data.length-1).replace(/(\r\n|\n|\r|\\)/gm," ");
         var _el = document.createElement("li");
         _el.appendChild(document.createTextNode(result));
         list.appendChild(_el);

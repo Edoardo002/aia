@@ -465,6 +465,7 @@ function startRagUI(model) {
             <span style="display: inline-block; margin-bottom: 10px">
               Ask questions to your RAGged model to unlock all Cogitch power.
             </span>
+            <MaterialButton class="ms-4" color="secondary" @click="changeFrame(1)"> ⭠ </MaterialButton>
 
             <div class="wrapper">
               <ul id="chatList">

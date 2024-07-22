@@ -86,7 +86,6 @@ function getClasses(size, success, error) {
       :placeholder="placeholder"
       :isRequired="isRequired"
       :disabled="isDisabled"
-      maxlength="40"
     />
   </div>
 </template>

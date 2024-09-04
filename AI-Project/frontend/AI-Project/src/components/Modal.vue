@@ -20,7 +20,7 @@ dialog {
     margin: auto;
 	padding: 1rem 3rem;
 	background: hsl(216, 50%, 16%);
-	max-width: 400px;
+	max-width: 800px;
 	padding-top: 2rem;
 	border-radius: 20px;
 	border: 0;

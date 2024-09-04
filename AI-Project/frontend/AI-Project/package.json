@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.3",
-    "pdfjs-dist": "^4.3.136",
+    "pdfjs-dist": "^4.6.82",
     "sass": "^1.71.1",
     "vite": "^5.0.11"
   }

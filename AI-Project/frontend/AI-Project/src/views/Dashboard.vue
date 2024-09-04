@@ -159,6 +159,8 @@ const showProfile= ref(false);
 const showPaymentMethod = ref(false);
 const showPlan = ref(false);
 
+const llm_openai = ref(false);
+
 const chat = ref(false);
 const chat_model = ref();
 
@@ -175,6 +177,7 @@ function clear(){
   showProfile.value = false;
   showPaymentMethod.value = false;
   showPlan.value = false;
+  chat.value = false;
 }
 
 function changeFrame(frame) {
@@ -202,6 +205,8 @@ function startRagUI(model) {
   clear();
   chat.value = true;
   chat_model.value = model;
+  if (model.split('-')[0] == "openai") 
+    llm_openai.value = true;
 }
 
 </script>
@@ -447,7 +452,9 @@ function startRagUI(model) {
               </fieldset><br>
               <MaterialButton id="sharebtn" color="secondary" :disabled="urlNotUploaded" @click="Logic.addSharepointContext(user_id)"
                 >use sharepoint</MaterialButton>
-              <input id="userFiles" type="file" accept=".txt, .pdf" v-on:change="onFileUpload" multiple="true">
+              <div>
+                <input id="userFiles" type="file" accept=".txt, .pdf, .csv, .html" v-on:change="onFileUpload" multiple="true">
+              </div>
               <MaterialButton id="uploadbtn" color="secondary" :disabled="filesNotUploaded" @click="Logic.addNewContext(user_id)"
                 >upload</MaterialButton>
             </Modal>
@@ -466,6 +473,27 @@ function startRagUI(model) {
               Ask questions to your RAGged model to unlock all Cogitch power.
             </span>
             <MaterialButton class="ms-4" color="secondary" @click="changeFrame(1)"> ⭠ </MaterialButton>
+
+            <div v-if="llm_openai">
+                <div role="form">
+                  <input
+                    id="temperature"
+                    placeholder="temperature"
+                    type="number"
+                    value="0.7"
+                    min="0.0"
+                    max="2.0"
+                  />
+                  <input
+                    id="top_p"
+                    placeholder="top_p"
+                    type="number"
+                    value="1.0"
+                    min="0.0"
+                    max="1.0"
+                  />
+                </div>
+            </div>   
 
             <div class="wrapper">
               <ul id="chatList">
@@ -579,6 +607,21 @@ input::file-selector-button {
   border: thin solid hsl(215, 32%, 27%, 0.5);
   border-radius: 8px;
   font-size: 0.8rem;
+}
+
+input[type=number] {
+  width: 8.0rem;
+  height: 2.5rem;
+  text-align: center;
+  -moz-border-radius: 1px;
+  -webkit-border-radius: 1px;
+  border-radius: 8px;
+  text-align: center;
+  border: 0.5px solid black;
+  display: inline-block;
+  margin-left: 0.2%;
+  background-color: hsl(215, 32%, 27%, 0.5);
+  color: white;
 }
 
 </style>

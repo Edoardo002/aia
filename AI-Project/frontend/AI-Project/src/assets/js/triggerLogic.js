@@ -1,5 +1,5 @@
 import * as pdfjs from 'pdfjs-dist';
-import * as pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs';
+//import * as pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs';
 pdfjs.GlobalWorkerOptions.workerSrc = import.meta.url + 'pdfjs-dist/build/pdf.worker.mjs';
 
 export function addNewContext(user_id) {
@@ -43,7 +43,7 @@ export function addNewContext(user_id) {
                             console.log(data);
                             return data;
                         } else {
-                            alert('Something went wrong. Please retry later!')
+                            alert('Something went wrong. Please retry later!\nNote that files with the same name cannot have multiple embeddings...Try renaming your file if you already uploaded it.');
                             const error = await response.json();
                             console.error(error);
                             return error;
@@ -53,7 +53,7 @@ export function addNewContext(user_id) {
             });
         });
     }
-    else if (files[0].type == "text/plain") {
+    else if (files[0].type == "text/plain" || files[0].type=="text/csv") {
         for(let i = 0;i < files.length;i++) {
             readers.push(readFileAsText(files[i]));
         }
@@ -77,7 +77,7 @@ export function addNewContext(user_id) {
                 console.log(data);
                 return data;
             } else {
-                alert('Something went wrong. Please retry later!')
+                alert('Something went wrong. Please retry later!\nNote that files with the same name cannot have multiple embeddings...Try renaming your file if you already uploaded it.');
                 const error = await response.json();
                 console.error(error);
                 return error;
@@ -277,12 +277,18 @@ export async function queryBot(user_id) {
     document.getElementById("sendbtn").disabled=true;
     document.getElementById("queryBot").value="";
     const rag_model = document.getElementById("chatName").innerHTML;
+    var temperature = null;
+    var top_p = null;
+    if (rag_model.split('-')[0]=="openai") {
+        temperature = document.getElementById("temperature").value;
+        top_p = document.getElementById("top_p").value;
+    }
     const response = await fetch('http://127.0.0.1:8000/chatbot/queryChatbot', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ user_id:user_id, rag_model:rag_model, query:query})
+        body: JSON.stringify({ user_id:user_id, rag_model:rag_model, query:query, temperature:temperature, top_p:top_p})
         });
     if (response.ok) {
         const data = await response.text();

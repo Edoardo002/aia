@@ -162,38 +162,65 @@ def loadContext(request):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=20)
     docs = text_splitter.split_documents(data)
     print(docs[0])
-    
-    index_def = {
-        "collectionName": collection_name,
-        "database": db_name,
-        "name": context_name.split('.')[0].replace(' ',''),
-        "type": "vectorSearch",
-        "definition": {
-            "fields":[
-                {
-                    "type": "vector",
-                    "path": "embedding",
-                    "numDimensions": 1536,
-                    "similarity": "cosine"
-                },
-                {
-                    "type": "filter",
-                    "path": "page"
-                }
-            ]
-        }
-    }
-
-    res = requests.post(url=IDX_URL, auth=HTTPDigestAuth(ATLAS_PUB_KEY, ATLAS_K), 
-                        headers={"Content-Type": "application/json", "Accept": "application/vnd.atlas.2024-05-30+json"},
-                        data=dumps(index_def))
-    if (not res.ok):
-       return HttpResponse(status.HTTP_405_METHOD_NOT_ALLOWED)
 
     if (embed=="openai"):
         embeddings = OpenAIEmbeddings(disallowed_special=())
+    
+        index_def = {
+            "collectionName": collection_name,
+            "database": db_name,
+            "name": context_name.split('.')[0].replace(' ',''),
+            "type": "vectorSearch",
+            "definition": {
+                "fields":[
+                    {
+                        "type": "vector",
+                        "path": "embedding",
+                        "numDimensions": 1536,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "page"
+                    }
+                ]
+            }
+        }
+
+        res = requests.post(url=IDX_URL, auth=HTTPDigestAuth(ATLAS_PUB_KEY, ATLAS_K), 
+                            headers={"Content-Type": "application/json", "Accept": "application/vnd.atlas.2024-05-30+json"},
+                            data=dumps(index_def))
+        if (not res.ok):
+           return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     elif (embed=="cohere"):
         embeddings = CohereEmbeddings(model="embed-multilingual-light-v3.0")
+
+        index_def = {
+            "collectionName": collection_name,
+            "database": db_name,
+            "name": context_name.split('.')[0].replace(' ',''),
+            "type": "vectorSearch",
+            "definition": {
+                "fields":[
+                    {
+                        "type": "vector",
+                        "path": "embedding",
+                        "numDimensions": 384,
+                        "similarity": "cosine"
+                    },
+                    {
+                        "type": "filter",
+                        "path": "page"
+                    }
+                ]
+            }
+        }
+
+        res = requests.post(url=IDX_URL, auth=HTTPDigestAuth(ATLAS_PUB_KEY, ATLAS_K), 
+                            headers={"Content-Type": "application/json", "Accept": "application/vnd.atlas.2024-05-30+json"},
+                            data=dumps(index_def))
+        if (not res.ok):
+           return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
 
     MongoDBAtlasVectorSearch.from_documents(
         documents = docs,
@@ -281,7 +308,10 @@ def query(request):
 
     if (model=="openai"):
 
-        llm = ChatOpenAI()
+        temperature = request.data.get('temperature')
+        top_p = request.data.get('top_p')
+
+        llm = ChatOpenAI(temperature=temperature, top_p=top_p, model_name="gpt-4-turbo")
 
         db_name = "langchain_db"
         db = clientAtlas.get_database(db_name)
